@@ -1,0 +1,108 @@
+[2025-06-25 22:24:57] [ERROR] Uncaught Exception: session_name(): Session name cannot be changed when a session is active Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\config\\security.php","line":255,"trace":"#0 [internal function]: {closure}(2, 'session_name():...', 'C:\\\\xampp\\\\htdocs...', 255)\n#1 C:\\xampp\\htdocs\\system\\frontend\\config\\security.php(255): session_name('vehicle_registr...')\n#2 C:\\xampp\\htdocs\\system\\frontend\\includes\\middleware\\security.php(27): initializeSecurity()\n#3 C:\\xampp\\htdocs\\system\\frontend\\login.php(4): SecurityMiddleware::initialize()\n#4 {main}"}
+[2025-06-25 22:28:26] [ERROR] Uncaught Exception: session_name(): Session name cannot be changed when a session is active Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\config\\security.php","line":255,"trace":"#0 [internal function]: {closure}(2, 'session_name():...', 'C:\\\\xampp\\\\htdocs...', 255)\n#1 C:\\xampp\\htdocs\\system\\frontend\\config\\security.php(255): session_name('vehicle_registr...')\n#2 C:\\xampp\\htdocs\\system\\frontend\\includes\\middleware\\security.php(27): initializeSecurity()\n#3 C:\\xampp\\htdocs\\system\\frontend\\login.php(4): SecurityMiddleware::initialize()\n#4 {main}"}
+[2025-06-25 22:30:07] [ERROR] Uncaught Exception: session_name(): Session name cannot be changed when a session is active Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\config\\security.php","line":255,"trace":"#0 [internal function]: {closure}(2, 'session_name():...', 'C:\\\\xampp\\\\htdocs...', 255)\n#1 C:\\xampp\\htdocs\\system\\frontend\\config\\security.php(255): session_name('vehicle_registr...')\n#2 C:\\xampp\\htdocs\\system\\frontend\\includes\\middleware\\security.php(27): initializeSecurity()\n#3 C:\\xampp\\htdocs\\system\\frontend\\login.php(4): SecurityMiddleware::initialize()\n#4 {main}"}
+[2025-06-25 22:30:12] [ERROR] Uncaught Exception: session_name(): Session name cannot be changed when a session is active Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\config\\security.php","line":255,"trace":"#0 [internal function]: {closure}(2, 'session_name():...', 'C:\\\\xampp\\\\htdocs...', 255)\n#1 C:\\xampp\\htdocs\\system\\frontend\\config\\security.php(255): session_name('vehicle_registr...')\n#2 C:\\xampp\\htdocs\\system\\frontend\\includes\\middleware\\security.php(27): initializeSecurity()\n#3 C:\\xampp\\htdocs\\system\\frontend\\login.php(4): SecurityMiddleware::initialize()\n#4 {main}"}
+[2025-06-25 22:30:54] [ERROR] Uncaught Exception: session_name(): Session name cannot be changed when a session is active Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\config\\security.php","line":255,"trace":"#0 [internal function]: {closure}(2, 'session_name():...', 'C:\\\\xampp\\\\htdocs...', 255)\n#1 C:\\xampp\\htdocs\\system\\frontend\\config\\security.php(255): session_name('vehicle_registr...')\n#2 C:\\xampp\\htdocs\\system\\frontend\\includes\\middleware\\security.php(27): initializeSecurity()\n#3 C:\\xampp\\htdocs\\system\\frontend\\login.php(4): SecurityMiddleware::initialize()\n#4 {main}"}
+[2025-06-25 22:31:02] [ERROR] Uncaught Exception: session_name(): Session name cannot be changed when a session is active Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\config\\security.php","line":255,"trace":"#0 [internal function]: {closure}(2, 'session_name():...', 'C:\\\\xampp\\\\htdocs...', 255)\n#1 C:\\xampp\\htdocs\\system\\frontend\\config\\security.php(255): session_name('vehicle_registr...')\n#2 C:\\xampp\\htdocs\\system\\frontend\\includes\\middleware\\security.php(27): initializeSecurity()\n#3 C:\\xampp\\htdocs\\system\\frontend\\admin-login.php(4): SecurityMiddleware::initialize()\n#4 {main}"}
+[2025-06-25 22:34:17] [ERROR] Uncaught Exception: session_name(): Session name cannot be changed when a session is active Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\config\\security.php","line":255,"trace":"#0 [internal function]: {closure}(2, 'session_name():...', 'C:\\\\xampp\\\\htdocs...', 255)\n#1 C:\\xampp\\htdocs\\system\\frontend\\config\\security.php(255): session_name('vehicle_registr...')\n#2 C:\\xampp\\htdocs\\system\\frontend\\includes\\middleware\\security.php(27): initializeSecurity()\n#3 C:\\xampp\\htdocs\\system\\frontend\\admin-login.php(4): SecurityMiddleware::initialize()\n#4 {main}"}
+[2025-06-25 22:37:30] [ERROR] Uncaught Exception: Undefined constant "RATE_LIMITING_SECURITY" Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\config\\security.php","line":304,"trace":"#0 C:\\xampp\\htdocs\\system\\frontend\\config\\security.php(304): constant('RATE_LIMITING_S...')\n#1 C:\\xampp\\htdocs\\system\\frontend\\config\\security.php(314): getSecurityConfig('rate_limiting')\n#2 C:\\xampp\\htdocs\\system\\frontend\\includes\\middleware\\security.php(52): isSecurityFeatureEnabled('rate_limiting')\n#3 C:\\xampp\\htdocs\\system\\frontend\\includes\\middleware\\security.php(30): SecurityMiddleware::applyRateLimiting()\n#4 C:\\xampp\\htdocs\\system\\frontend\\login.php(4): SecurityMiddleware::initialize()\n#5 {main}"}
+[2025-06-25 22:37:31] [ERROR] Uncaught Exception: Undefined constant "RATE_LIMITING_SECURITY" Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\config\\security.php","line":304,"trace":"#0 C:\\xampp\\htdocs\\system\\frontend\\config\\security.php(304): constant('RATE_LIMITING_S...')\n#1 C:\\xampp\\htdocs\\system\\frontend\\config\\security.php(314): getSecurityConfig('rate_limiting')\n#2 C:\\xampp\\htdocs\\system\\frontend\\includes\\middleware\\security.php(52): isSecurityFeatureEnabled('rate_limiting')\n#3 C:\\xampp\\htdocs\\system\\frontend\\includes\\middleware\\security.php(30): SecurityMiddleware::applyRateLimiting()\n#4 C:\\xampp\\htdocs\\system\\frontend\\login.php(4): SecurityMiddleware::initialize()\n#5 {main}"}
+[2025-06-25 22:39:24] [ERROR] Uncaught Exception: Undefined array key "login_attempts" Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\includes\\middleware\\security.php","line":62,"trace":"#0 C:\\xampp\\htdocs\\system\\frontend\\includes\\middleware\\security.php(62): {closure}(2, 'Undefined array...', 'C:\\\\xampp\\\\htdocs...', 62)\n#1 C:\\xampp\\htdocs\\system\\frontend\\includes\\middleware\\security.php(30): SecurityMiddleware::applyRateLimiting()\n#2 C:\\xampp\\htdocs\\system\\frontend\\login.php(4): SecurityMiddleware::initialize()\n#3 {main}"}
+[2025-06-25 22:40:58] [ERROR] Uncaught Exception: Undefined array key "enabled" Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\includes\\middleware\\security.php","line":497,"trace":"#0 C:\\xampp\\htdocs\\system\\frontend\\includes\\middleware\\security.php(497): {closure}(2, 'Undefined array...', 'C:\\\\xampp\\\\htdocs...', 497)\n#1 C:\\xampp\\htdocs\\system\\frontend\\includes\\middleware\\security.php(38): SecurityMiddleware::logSecurityEvent('request_start', Array)\n#2 C:\\xampp\\htdocs\\system\\frontend\\login.php(4): SecurityMiddleware::initialize()\n#3 {main}"}
+[2025-06-25 23:28:49] [ERROR] Login error: Undefined array key "Email"
+[2025-06-25 23:28:53] [ERROR] Login error: Undefined array key "Email"
+[2025-06-25 23:29:16] [ERROR] Uncaught Exception: htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\vehicle-list.php","line":342,"trace":"#0 [internal function]: {closure}(8192, 'htmlspecialchar...', 'C:\\\\xampp\\\\htdocs...', 342)\n#1 C:\\xampp\\htdocs\\system\\frontend\\vehicle-list.php(342): htmlspecialchars(NULL)\n#2 {main}"}
+[2025-06-25 23:30:16] [ERROR] Login error: Undefined array key "Email"
+[2025-06-25 23:31:31] [ERROR] Login error: Undefined array key "Email"
+[2025-06-25 23:33:54] [ERROR] Login error: Undefined array key "Email"
+[2025-06-25 23:39:05] [ERROR] Login error: Undefined array key "fullname"
+[2025-06-25 23:40:32] [ERROR] Uncaught Exception: htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\vehicle-list.php","line":342,"trace":"#0 [internal function]: {closure}(8192, 'htmlspecialchar...', 'C:\\\\xampp\\\\htdocs...', 342)\n#1 C:\\xampp\\htdocs\\system\\frontend\\vehicle-list.php(342): htmlspecialchars(NULL)\n#2 {main}"}
+[2025-06-26 00:05:40] [ERROR] Login error: Undefined array key "fullname"
+[2025-06-26 00:05:53] [ERROR] Login error: Undefined array key "fullname"
+[2025-06-26 00:06:26] [ERROR] Login error: Undefined array key "fullname"
+[2025-06-26 00:09:03] [ERROR] Login error: Undefined array key "fullname"
+[2025-06-26 00:09:12] [ERROR] Login error: Undefined array key "fullname"
+[2025-06-26 00:11:23] [ERROR] Login error: Undefined array key "fullname"
+[2025-06-26 00:15:06] [ERROR] Login error: Undefined array key "fullname"
+[2025-06-26 00:15:23] [ERROR] Login error: Undefined array key "fullname"
+[2025-06-26 00:20:50] [ERROR] Login error: Unknown column 'last_login' in 'field list'
+[2025-06-26 00:21:22] [ERROR] Login error: Unknown column 'last_login' in 'field list'
+[2025-06-26 00:22:27] [ERROR] Login error: Unknown column 'last_login' in 'field list'
+[2025-06-26 00:31:24] [ERROR] Login error: Unknown column 'last_login' in 'field list'
+[2025-06-26 00:31:39] [ERROR] Login error: Unknown column 'last_login' in 'field list'
+[2025-06-26 00:31:59] [ERROR] Login error: Unknown column 'last_login' in 'field list'
+[2025-08-11 19:34:30] [ERROR] Login error: Unknown column 'last_login' in 'field list'
+[2025-08-11 23:40:43] [ERROR] Login error: Unknown column 'last_login' in 'field list'
+[2025-08-12 07:21:54] [ERROR] Login error: Unknown column 'last_login' in 'field list'
+[2025-08-12 07:23:06] [ERROR] Login error: Unknown column 'last_login' in 'field list'
+[2025-08-12 07:46:45] [ERROR] Login error: Unknown column 'last_login' in 'field list'
+[2025-08-12 07:47:26] [ERROR] Login error: Unknown column 'last_login' in 'field list'
+[2025-08-12 08:02:42] [ERROR] Login error: Unknown column 'last_login' in 'field list'
+[2025-08-12 10:55:54] [ERROR] Login error: Unknown column 'last_login' in 'field list'
+[2025-08-12 11:23:25] [ERROR] Login error: Unknown column 'last_login' in 'field list'
+[2025-08-12 11:33:24] [ERROR] Uncaught Exception: session_start(): Ignoring session_start() because a session is already active Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\submit_registration.php","line":7,"trace":"#0 [internal function]: {closure}(8, 'session_start()...', 'C:\\\\xampp\\\\htdocs...', 7)\n#1 C:\\xampp\\htdocs\\system\\frontend\\submit_registration.php(7): session_start()\n#2 {main}"}
+[2025-08-12 11:39:51] [ERROR] Uncaught Exception: session_start(): Ignoring session_start() because a session is already active Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\submit_registration.php","line":7,"trace":"#0 [internal function]: {closure}(8, 'session_start()...', 'C:\\\\xampp\\\\htdocs...', 7)\n#1 C:\\xampp\\htdocs\\system\\frontend\\submit_registration.php(7): session_start()\n#2 {main}"}
+[12-Aug-2025 12:19:32 Europe/Berlin] Received POST data: Array
+(
+    [registrantType] => student
+    [studentRegNo] => 230577
+    [staffsRegNo] => 
+    [fullName] => Ebubechi Emmanuel E Ezugwu
+    [password] => adens1234
+    [phone] => 07010429437
+    [Email] => ee@gmail.com
+    [college] => College of Engineering and Applied Sciences
+    [idNumber] => 234444
+    [licenseNumber] => 006551496001
+    [licenseClass] => A
+    [licenseDate] => 2006-04-05
+    [vehicles] => Array
+        (
+            [0] => Array
+                (
+                    [regNumber] => 230517
+                    [make] => Toyota Corolla
+                    [owner] => Susan Keller
+                    [address] => AU, 1 Fairview Rd, Old Mutare, Zimbabwe
+                    [PlateNumber] => PLT-5678
+                    [drivers] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [fullName] => Ebubechi Emmanuel E Ezugwu
+                                    [licenseNumber] => bjhhjj
+                                    [contact] => bn889
+                                )
+
+                        )
+
+                )
+
+        )
+
+)
+
+[12-Aug-2025 12:25:10 Europe/Berlin] Received POST data: Array
+(
+    [_token] => fa311a62d863890cad3d8c829b14e86ca5c1fb3f804f1c255a661d917d620752
+    [registrantType] => student
+    [studentRegNo] => 210275
+    [staffsRegNo] => 
+    [fullName] => Ebubechi Emmanuel E Ezugwu
+    [password] => 12345678
+    [phone] => 07010429437
+    [Email] => eee@gmail
+    [college] => College of Engineering and Applied Sciences
+    [idNumber] => ertyhjkkkkk
+    [licenseNumber] => CD123
+    [licenseClass] => C
+    [licenseDate] => 2025-09-06
+    [vehicles] => [{"regNumber":"AB1234567v","make":"corolla","owner":"Susan Keller","address":"road p2 shargari estate barnawa","PlateNumber":"2222222","drivers":[{"fullName":"Ebubechi Emmanuel E Ezugwu","licenseNumber":"DL77443322","contact":"70701034423"}]}]
+)
+
+[2025-08-12 12:25:39] [ERROR] Login error: Unknown column 'last_login' in 'field list'
+[2025-08-12 12:28:43] [ERROR] Login error: Unknown column 'last_login' in 'field list'
+[2025-08-12 12:33:59] [ERROR] Login error: Unknown column 'last_login' in 'field list'
+[2025-08-12 12:40:12] [ERROR] Login error: Unknown column 'last_login' in 'field list'
+[2025-08-12 12:42:48] [ERROR] Login error: Unknown column 'last_login' in 'field list'
+[2025-08-12 21:51:21] [ERROR] Login error: Unknown column 'last_login' in 'field list'
