@@ -95,8 +95,8 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Vehicle Registration System</title>
-    <!-- Add Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/styles.css">
     <meta name="csrf-token" content="<?= htmlspecialchars($csrfToken) ?>">
     <style>
@@ -129,12 +129,7 @@ $conn->close();
         }
 
         /* Header Styling */
-        header {
-            background-color: var(--primary-red); /* Red header like the image */
-            padding: 1rem 2rem;
-            color: var(--white);
-            box-shadow: var(--shadow-sm);
-        }
+        header { background: linear-gradient(90deg, rgba(208,0,0,1) 0%, rgba(176,0,0,1) 100%); padding: 1rem 2rem; color: var(--white); box-shadow: var(--shadow-sm); }
 
          .header-content {
             display: flex; /* Use flexbox for layout */
@@ -160,37 +155,10 @@ $conn->close();
         /* Using shared .btn .btn-logout from assets/css/styles.css */
 
         /* Admin Navigation Styling */
-        .admin-nav {
-            background: var(--white);
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 2rem;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .admin-nav ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            gap: 1rem; /* Space between nav items */
-            flex-wrap: wrap;
-        }
-
-        .admin-nav a {
-            text-decoration: none;
-            color: var(--gray-800);
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            transition: all 0.2s ease;
-        }
-
-        .admin-nav a:hover,
-        .admin-nav a.active {
-            background-color: var(--primary-red); /* Red active/hover state like the image */
-            color: var(--white);
-        }
+        .admin-nav { background: var(--white); padding: 1rem; border-radius: 8px; margin-bottom: 2rem; box-shadow: var(--shadow-sm); }
+        .admin-nav ul { list-style: none; padding: 0; margin: 0; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .admin-nav a { color: var(--primary-red); text-decoration: none; padding: 0.65rem 1rem; border-radius: 6px; transition: all 0.2s ease; font-weight: 500; display: inline-block; }
+        .admin-nav a:hover, .admin-nav a.active { background-color: var(--primary-red); color: var(--white); box-shadow: var(--shadow-sm); }
 
         /* Stats Container Styling */
         .stats-container {
@@ -252,13 +220,7 @@ $conn->close();
         /* Quick Actions Styling */
         .quick-actions,
         .recent-activity,
-        .notifications-section { /* Also style recent activity and notifications */
-            background: var(--white);
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-bottom: 2rem;
-            box-shadow: var(--shadow-sm);
-        }
+        .notifications-section { background: var(--white); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; box-shadow: var(--shadow-sm); }
 
         .quick-actions h2,
         .recent-activity h2,
@@ -269,46 +231,13 @@ $conn->close();
             font-size: 1.5rem;
         }
 
-        .action-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem; /* Space between buttons */
-            margin-top: 1rem;
-        }
+        .action-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 1rem; }
 
-        .action-button {
-            background-color: var(--primary-red); /* Red button */
-            color: var(--white);
-            padding: 0.75rem 1.5rem; /* Increased padding */
-            text-align: center;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: background 0.3s ease, box-shadow 0.2s ease, transform 0.2s ease;
-            display: inline-block; /* Allow padding and hover effect */
-            box-shadow: var(--shadow-sm);
-        }
+        .action-button { background-color: var(--primary-red); color: var(--white); padding: 0.9rem 1.2rem; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; letter-spacing:.2px; transition: background .3s ease, box-shadow .2s ease, transform .2s ease; display: inline-flex; align-items:center; justify-content:center; gap:.5rem; box-shadow: var(--shadow-sm); }
 
-        .btn-primary {
-            background-color: var(--primary-red);
-            color: var(--white);
-            padding: 0.75rem 1.5rem; /* Increased padding */
-            text-align: center;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: background 0.3s ease, box-shadow 0.2s ease, transform 0.2s ease;
-            display: inline-block; /* Allow padding and hover effect */
-            border: none;
-            cursor: pointer;
-            box-shadow: var(--shadow-sm);
-        }
+        .btn-primary { background-color: var(--primary-red); color: var(--white); padding: 0.75rem 1.2rem; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items:center; gap:.5rem; border: none; cursor: pointer; box-shadow: var(--shadow-sm); }
 
-        .action-button:hover, .btn-primary:hover {
-            background-color: var(--primary-red-dark); /* Darken on hover */
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-md);
-        }
+        .action-button:hover, .btn-primary:hover { background-color: var(--primary-red-600); transform: translateY(-1px); box-shadow: var(--shadow-md); }
 
          /* Table Styling */
         .table-container {
@@ -639,7 +568,10 @@ $conn->close();
                     <h1>Admin Dashboard</h1>
                 </div>
                 <div class="header-right">
-                    <button onclick="logout()" class="btn btn-logout">Logout</button>
+                    <form id="adminLogoutForm" action="logout.php" method="POST" style="margin:0;">
+                        <input type="hidden" name="_token" value="<?= htmlspecialchars($csrfToken) ?>">
+                        <button type="submit" class="btn btn-logout" aria-label="Logout">Logout</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -782,8 +714,10 @@ $conn->close();
     <div id="alert" class="alert"></div>
 
     <script>
+        // Fallback logout if needed
         function logout() {
-            window.location.href = 'logout.php';
+            const f = document.getElementById('adminLogoutForm');
+            if (f) { f.submit(); } else { window.location.href = 'logout.php'; }
         }
 
         function updateNotifications() {

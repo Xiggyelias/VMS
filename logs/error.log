@@ -106,3 +106,126 @@
 [2025-08-12 12:40:12] [ERROR] Login error: Unknown column 'last_login' in 'field list'
 [2025-08-12 12:42:48] [ERROR] Login error: Unknown column 'last_login' in 'field list'
 [2025-08-12 21:51:21] [ERROR] Login error: Unknown column 'last_login' in 'field list'
+[2025-08-14 10:02:49] [ERROR] Login error: Unknown column 'last_login' in 'field list'
+[2025-08-14 11:19:33] [ERROR] Login error: Unknown column 'last_login' in 'field list'
+[2025-08-25 14:21:02] [ERROR] Uncaught Exception: Table 'vehicleregistrationsystem.authorized_driver' doesn't exist Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\admin-dashboard.php","line":32,"trace":"#0 C:\\xampp\\htdocs\\system\\frontend\\admin-dashboard.php(32): mysqli->prepare('SELECT COUNT(*)...')\n#1 {main}"}
+[25-Aug-2025 18:51:59 Europe/Berlin] Received POST data: Array
+(
+    [_token] => 519647c5c082ec4fa7b2ae2a42a00e85e0b76fcdd53297064538ea7fb5d15070
+    [registrantType] => student
+    [studentRegNo] => 230548
+    [staffsRegNo] => 
+    [fullName] => Ebubechi Emmanuel E Ezugwu
+    [password] => 1234567890
+    [phone] => 07010429437
+    [Email] => ebubechiezugwu@gmail.com
+    [college] => College of Engineering and Applied Sciences
+    [idNumber] => 234444
+    [licenseNumber] => 006551496001
+    [licenseClass] => C
+    [licenseDate] => 0022-02-10
+    [vehicles] => [{"regNumber":"22306","make":"Toyota Corolla","owner":"erling halaand","address":"AU, 1 Fairview Rd, Old Mutare, Zimbabwe","PlateNumber":"2222222","drivers":[{"fullName":"Ebubechi E","licenseNumber":"11111ljkod","contact":"+263773987654"}]}]
+)
+
+[2025-08-25 18:51:59] [ERROR] Uncaught Exception: mysqli_stmt::bind_param(): Argument #5 cannot be passed by reference Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\submit_registration.php","line":161,"trace":"#0 {main}"}
+[25-Aug-2025 18:54:34 Europe/Berlin] Received POST data: Array
+(
+    [_token] => d8a3ea687c819765436fb0ae0044c3f3851eb4d473ac59d37fe1a4553301c211
+    [registrantType] => student
+    [studentRegNo] => 234456
+    [staffsRegNo] => 
+    [fullName] => Ebubechi Emmanuel E Ezugwu
+    [password] => 1234567890
+    [phone] => 07010429437
+    [Email] => ebubechiezugwu@gmail.com
+    [college] => College of Business and Management Sciences
+    [idNumber] => a13222
+    [licenseNumber] => 7yh33822
+    [licenseClass] => C
+    [licenseDate] => 2025-08-08
+    [vehicles] => [{"regNumber":"22306456","make":"rolls royce","owner":"james ezugwu","address":"road p2 shargari estate barnawa","PlateNumber":"ZIM-4477","drivers":[{"fullName":"Ebubechi Em","licenseNumber":"li346b65","contact":"70701034423"}]}]
+)
+
+[2025-08-25 18:54:34] [ERROR] Uncaught Exception: mysqli_stmt::bind_param(): Argument #5 cannot be passed by reference Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\submit_registration.php","line":161,"trace":"#0 {main}"}
+[2025-09-02 20:18:22] [ERROR] Uncaught Exception: htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\admin-dashboard.php","line":738,"trace":"#0 [internal function]: {closure}(8192, 'htmlspecialchar...', 'C:\\\\xampp\\\\htdocs...', 738)\n#1 C:\\xampp\\htdocs\\system\\frontend\\admin-dashboard.php(738): htmlspecialchars(NULL)\n#2 {main}"}
+[2025-09-02 20:19:07] [ERROR] Uncaught Exception: htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\admin-dashboard.php","line":738,"trace":"#0 [internal function]: {closure}(8192, 'htmlspecialchar...', 'C:\\\\xampp\\\\htdocs...', 738)\n#1 C:\\xampp\\htdocs\\system\\frontend\\admin-dashboard.php(738): htmlspecialchars(NULL)\n#2 {main}"}
+[2025-09-02 20:19:46] [ERROR] Uncaught Exception: htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\admin-dashboard.php","line":738,"trace":"#0 [internal function]: {closure}(8192, 'htmlspecialchar...', 'C:\\\\xampp\\\\htdocs...', 738)\n#1 C:\\xampp\\htdocs\\system\\frontend\\admin-dashboard.php(738): htmlspecialchars(NULL)\n#2 {main}"}
+[2025-09-02 20:20:15] [ERROR] Uncaught Exception: htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\admin-dashboard.php","line":738,"trace":"#0 [internal function]: {closure}(8192, 'htmlspecialchar...', 'C:\\\\xampp\\\\htdocs...', 738)\n#1 C:\\xampp\\htdocs\\system\\frontend\\admin-dashboard.php(738): htmlspecialchars(NULL)\n#2 {main}"}
+[2025-09-02 20:24:31] [ERROR] Uncaught Exception: htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\admin-dashboard.php","line":738,"trace":"#0 [internal function]: {closure}(8192, 'htmlspecialchar...', 'C:\\\\xampp\\\\htdocs...', 738)\n#1 C:\\xampp\\htdocs\\system\\frontend\\admin-dashboard.php(738): htmlspecialchars(NULL)\n#2 {main}"}
+[2025-09-02 20:24:40] [ERROR] Uncaught Exception: htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\admin-dashboard.php","line":738,"trace":"#0 [internal function]: {closure}(8192, 'htmlspecialchar...', 'C:\\\\xampp\\\\htdocs...', 738)\n#1 C:\\xampp\\htdocs\\system\\frontend\\admin-dashboard.php(738): htmlspecialchars(NULL)\n#2 {main}"}
+[2025-09-02 23:19:42] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":18,"trace":"#0 {main}"}
+[2025-09-02 23:19:48] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":18,"trace":"#0 {main}"}
+[2025-09-02 23:20:22] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":18,"trace":"#0 {main}"}
+[2025-09-02 23:20:29] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":18,"trace":"#0 {main}"}
+[2025-09-02 23:21:25] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":23,"trace":"#0 {main}"}
+[2025-09-02 23:22:20] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":23,"trace":"#0 {main}"}
+[2025-09-02 23:22:50] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":23,"trace":"#0 {main}"}
+[2025-09-02 23:24:40] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":23,"trace":"#0 {main}"}
+[2025-09-02 23:26:40] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":23,"trace":"#0 {main}"}
+[2025-09-02 23:27:06] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":23,"trace":"#0 {main}"}
+[2025-09-02 23:27:11] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":23,"trace":"#0 {main}"}
+[2025-09-02 23:27:16] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":23,"trace":"#0 {main}"}
+[2025-09-02 23:27:35] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":23,"trace":"#0 {main}"}
+[2025-09-02 23:30:27] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":19,"trace":"#0 {main}"}
+[2025-09-02 23:30:42] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":19,"trace":"#0 {main}"}
+[2025-09-03 10:03:47] [ERROR] Uncaught Exception: mysqli_stmt object is already closed Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\vehicle_operations.php","line":196,"trace":"#0 C:\\xampp\\htdocs\\system\\frontend\\vehicle_operations.php(196): mysqli_stmt->close()\n#1 {main}"}
+[2025-09-03 10:04:17] [ERROR] Uncaught Exception: mysqli_stmt object is already closed Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\vehicle_operations.php","line":196,"trace":"#0 C:\\xampp\\htdocs\\system\\frontend\\vehicle_operations.php(196): mysqli_stmt->close()\n#1 {main}"}
+[2025-09-03 10:20:43] [ERROR] Uncaught Exception: mysqli_stmt object is already closed Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\vehicle_operations.php","line":196,"trace":"#0 C:\\xampp\\htdocs\\system\\frontend\\vehicle_operations.php(196): mysqli_stmt->close()\n#1 {main}"}
+[2025-09-13 10:27:24] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":31,"trace":"#0 {main}"}
+[2025-09-13 10:27:29] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":31,"trace":"#0 {main}"}
+[2025-09-13 10:27:39] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":31,"trace":"#0 {main}"}
+[2025-09-13 10:30:26] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":43,"trace":"#0 {main}"}
+[2025-09-13 10:30:43] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":43,"trace":"#0 {main}"}
+[2025-09-13 10:31:06] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":43,"trace":"#0 {main}"}
+[2025-09-13 10:31:08] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":43,"trace":"#0 {main}"}
+[2025-09-13 10:32:06] [ERROR] Uncaught Exception: mysqli_stmt object is already closed Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\vehicle_operations.php","line":196,"trace":"#0 C:\\xampp\\htdocs\\system\\frontend\\vehicle_operations.php(196): mysqli_stmt->close()\n#1 {main}"}
+[2025-09-13 10:32:48] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":43,"trace":"#0 {main}"}
+[2025-09-13 10:32:49] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":43,"trace":"#0 {main}"}
+[2025-09-13 10:36:51] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":43,"trace":"#0 {main}"}
+[2025-09-13 10:37:06] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":43,"trace":"#0 {main}"}
+[2025-09-13 10:37:19] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":43,"trace":"#0 {main}"}
+[2025-09-13 10:37:23] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":43,"trace":"#0 {main}"}
+[2025-09-13 10:37:25] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":43,"trace":"#0 {main}"}
+[2025-09-13 10:37:26] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":43,"trace":"#0 {main}"}
+[2025-09-13 10:49:20] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":83,"trace":"#0 {main}"}
+[2025-09-13 10:49:46] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":83,"trace":"#0 {main}"}
+[2025-09-13 10:50:28] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":83,"trace":"#0 {main}"}
+[2025-09-13 10:51:36] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":83,"trace":"#0 {main}"}
+[2025-09-13 10:52:44] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":83,"trace":"#0 {main}"}
+[2025-09-13 10:52:47] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":83,"trace":"#0 {main}"}
+[2025-09-13 10:52:48] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":83,"trace":"#0 {main}"}
+[2025-09-13 10:52:48] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":83,"trace":"#0 {main}"}
+[2025-09-13 10:52:48] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":83,"trace":"#0 {main}"}
+[2025-09-13 10:52:49] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":83,"trace":"#0 {main}"}
+[2025-09-13 10:52:49] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":83,"trace":"#0 {main}"}
+[2025-09-13 10:52:49] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":83,"trace":"#0 {main}"}
+[2025-09-23 11:50:16] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":83,"trace":"#0 {main}"}
+[2025-09-23 11:50:25] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":83,"trace":"#0 {main}"}
+[2025-09-23 15:27:17] [ERROR] Uncaught Exception: htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\admin-dashboard.php","line":740,"trace":"#0 [internal function]: {closure}(8192, 'htmlspecialchar...', 'C:\\\\xampp\\\\htdocs...', 740)\n#1 C:\\xampp\\htdocs\\system\\frontend\\admin-dashboard.php(740): htmlspecialchars(NULL)\n#2 {main}"}
+[2025-09-23 15:29:37] [ERROR] Uncaught Exception: Call to undefined method SecurityMiddleware::validateCSRFToken() Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\update-owner-info.php","line":83,"trace":"#0 {main}"}
+[2025-09-23 15:33:01] [ERROR] Uncaught Exception: mysqli_stmt object is already closed Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\vehicle_operations.php","line":196,"trace":"#0 C:\\xampp\\htdocs\\system\\frontend\\vehicle_operations.php(196): mysqli_stmt->close()\n#1 {main}"}
+[2025-09-23 15:36:41] [ERROR] Uncaught Exception: mysqli_stmt object is already closed Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\vehicle_operations.php","line":195,"trace":"#0 C:\\xampp\\htdocs\\system\\frontend\\vehicle_operations.php(195): mysqli_stmt->close()\n#1 {main}"}
+[23-Sep-2025 15:43:26 Europe/Berlin] Vehicle delete error: Vehicle not found or not authorized.
+[25-Sep-2025 11:00:52 Europe/Berlin] Vehicle delete error: Vehicle not found or not authorized.
+[25-Sep-2025 11:12:13 Europe/Berlin] Vehicle delete error: Vehicle not found or not authorized.
+[25-Sep-2025 11:29:11 Europe/Berlin] Vehicle delete error: Vehicle not found or not authorized.
+[25-Sep-2025 11:53:35 Europe/Berlin] vehicle_operations error: mysqli_stmt object is already closed
+[25-Sep-2025 11:53:40 Europe/Berlin] Vehicle delete error: Vehicle not found or not authorized.
+[25-Sep-2025 11:53:45 Europe/Berlin] Vehicle delete error: Vehicle not found or not authorized.
+[25-Sep-2025 12:03:12 Europe/Berlin] vehicle_operations error: mysqli_stmt object is already closed
+[25-Sep-2025 13:41:30 Europe/Berlin] role_registration error: Call to undefined function getDBConnection()
+[25-Sep-2025 20:54:54 Europe/Berlin] vehicle_operations error: mysqli_stmt object is already closed
+[25-Sep-2025 20:55:41 Europe/Berlin] vehicle_operations error: mysqli_stmt object is already closed
+[26-Sep-2025 09:54:56 Europe/Berlin] vehicle_operations error: mysqli_stmt object is already closed
+[26-Sep-2025 09:55:09 Europe/Berlin] vehicle_operations error: mysqli_stmt object is already closed
+[26-Sep-2025 10:13:16 Europe/Berlin] vehicle_operations error: mysqli_stmt object is already closed
+[26-Sep-2025 10:21:00 Europe/Berlin] vehicle_operations error: mysqli_stmt object is already closed
+[26-Sep-2025 10:26:22 Europe/Berlin] vehicle_operations error: mysqli_stmt object is already closed
+[26-Sep-2025 10:59:16 Europe/Berlin] vehicle_operations error: mysqli_stmt object is already closed
+[2025-09-26 11:14:16] [ERROR] Uncaught Exception: Unknown table 'vehicleregistrationsystem.v' Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\owner-details.php","line":46,"trace":"#0 C:\\xampp\\htdocs\\system\\frontend\\owner-details.php(46): mysqli->prepare('\\n    SELECT v.*...')\n#1 {main}"}
+[2025-09-26 11:14:46] [ERROR] Uncaught Exception: Undefined array key "make" Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\owner-details.php","line":388,"trace":"#0 C:\\xampp\\htdocs\\system\\frontend\\owner-details.php(388): {closure}(2, 'Undefined array...', 'C:\\\\xampp\\\\htdocs...', 388)\n#1 {main}"}
+[2025-09-26 11:20:03] [ERROR] Uncaught Exception: Undefined array key "make" Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\owner-details.php","line":388,"trace":"#0 C:\\xampp\\htdocs\\system\\frontend\\owner-details.php(388): {closure}(2, 'Undefined array...', 'C:\\\\xampp\\\\htdocs...', 388)\n#1 {main}"}
+[2025-09-26 11:20:41] [ERROR] Uncaught Exception: Undefined array key "make" Context: {"file":"C:\\xampp\\htdocs\\system\\frontend\\owner-details.php","line":409,"trace":"#0 C:\\xampp\\htdocs\\system\\frontend\\owner-details.php(409): {closure}(2, 'Undefined array...', 'C:\\\\xampp\\\\htdocs...', 409)\n#1 {main}"}
+[2025-09-26 19:23:17] [ERROR] Admin login error: MySQL server has gone away
+[2025-09-26 19:23:34] [ERROR] Admin login error: MySQL server has gone away
+[2025-09-26 19:24:11] [ERROR] Admin login error: MySQL server has gone away

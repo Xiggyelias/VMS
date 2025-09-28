@@ -8,11 +8,11 @@
 
 // Security Headers Configuration
 define('SECURITY_HEADERS', [
-    'X-Frame-Options' => 'DENY',
+    'X-Frame-Options' => 'SAMEORIGIN',
     'X-Content-Type-Options' => 'nosniff',
     'X-XSS-Protection' => '1; mode=block',
     'Referrer-Policy' => 'strict-origin-when-cross-origin',
-    'Content-Security-Policy' => "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'none';",
+    'Content-Security-Policy' => "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://accounts.google.com; img-src 'self' data: https: https://accounts.google.com; font-src 'self' data: https://cdnjs.cloudflare.com; connect-src 'self' https://accounts.google.com https://oauth2.googleapis.com; frame-src 'self' https://accounts.google.com; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self';",
     'Permissions-Policy' => 'geolocation=(), microphone=(), camera=()',
     'Strict-Transport-Security' => 'max-age=31536000; includeSubDomains; preload'
 ]);
@@ -59,12 +59,15 @@ define('CSRF_SECURITY', [
         '/api/webhook/*',
         '/health-check',
         '/login.php',
-        '/login1.php',
         '/admin-login.php',
         '/forgot_password.php',
-        '/reset-password.php',
         '/process-reset.php',
-        '/send-reset.php'
+        '/send-reset.php',
+        '/google_auth.php',
+        '/registration-form.php',
+        '/submit_registration.php',
+        '/save_registration_draft.php',
+        '/get_registration_draft.php'
     ]
 ]);
 
@@ -162,12 +165,9 @@ define('XSS_PROTECTION', [
 
 // Access Control Configuration
 define('ACCESS_CONTROL', [
-    'default_role' => 'guest',
+    'default_role' => 'student',
     'roles' => [
-        'guest' => [
-            'permissions' => ['view_public', 'register'],
-            'max_vehicles' => 0
-        ],
+        // guest removed
         'student' => [
             'permissions' => ['view_own_vehicles', 'manage_own_vehicles', 'manage_drivers'],
             'max_vehicles' => 1

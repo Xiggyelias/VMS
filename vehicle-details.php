@@ -46,9 +46,12 @@ if (!$vehicle) {
     exit();
 }
 
+// Extract applicant_id from the first query result for subsequent queries
+$applicant_id = (int)$vehicle['applicant_id'];
+
 // Get authorized drivers for this vehicle
-$stmt = $conn->prepare("SELECT * FROM authorized_driver WHERE vehicle_id = ?");
-$stmt->bind_param("i", $vehicle_id);
+$stmt = $conn->prepare("SELECT * FROM authorized_driver WHERE applicant_id = ?");
+$stmt->bind_param("i", $applicant_id);
 $stmt->execute();
 $drivers = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 

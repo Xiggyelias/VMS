@@ -3,9 +3,13 @@ require_once __DIR__ . '/includes/init.php';
 require_once __DIR__ . '/includes/middleware/security.php';
 SecurityMiddleware::initialize();
 
+// Always respond in JSON
+header('Content-Type: application/json; charset=UTF-8');
+
 // Check if user is logged in
 if (!isLoggedIn()) {
-    echo json_encode(['success' => false, 'message' => 'Please log in to continue.']);
+    http_response_code(401);
+    echo json_encode(['status' => 'error', 'success' => false, 'message' => 'Please log in to continue.']);
     exit();
 }
 
@@ -20,7 +24,7 @@ function getDBConnection() {
 
 // Handle POST request
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $response = ['success' => false, 'message' => ''];
+    $response = ['status' => 'error', 'success' => false, 'message' => ''];
     
     $action = $_POST['action'] ?? '';
     
@@ -52,6 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->bind_param("isss", $applicant_id, $fullname, $licenseNumber, $contact);
                 
                 if ($stmt->execute()) {
+                    $response['status'] = 'success';
                     $response['success'] = true;
                     $response['message'] = 'Driver added successfully!';
                 } else {
@@ -83,6 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->bind_param("sssi", $fullname, $licenseNumber, $contact, $driver_id);
                 
                 if ($stmt->execute()) {
+                    $response['status'] = 'success';
                     $response['success'] = true;
                     $response['message'] = 'Driver updated successfully!';
                 } else {
@@ -102,6 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->bind_param("i", $driver_id);
                 
                 if ($stmt->execute()) {
+                    $response['status'] = 'success';
                     $response['success'] = true;
                     $response['message'] = 'Driver deleted successfully!';
                 } else {
@@ -121,6 +128,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
     } catch (Exception $e) {
+        http_response_code(400);
+        $response['status'] = 'error';
         $response['message'] = $e->getMessage();
     }
     
@@ -129,6 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // If not POST request
-echo json_encode(['success' => false, 'message' => 'Invalid request method.']);
+http_response_code(405);
+echo json_encode(['status' => 'error', 'success' => false, 'message' => 'Invalid request method.']);
 exit();
 ?>

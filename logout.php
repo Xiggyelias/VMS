@@ -16,4 +16,5 @@ if (ini_get('session.use_cookies')) {
     );
 }
 
-redirect(BASE_URL . '/login.php'); 
+// Always redirect to user login page after logout
+redirect(BASE_URL . '/login.php');

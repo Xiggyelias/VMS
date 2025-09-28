@@ -27,41 +27,92 @@ function getDBConnection() {
 $success_message = '';
 $error_message = '';
 
-// Handle form submission
+// Handle form submission (Create report with optional fields and file upload)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $conn = getDBConnection();
-
-    // Sanitize and check input
-    $title = isset($_POST['title']) ? trim($_POST['title']) : '';
-    $description = isset($_POST['content']) ? trim($_POST['content']) : '';
-    $category = isset($_POST['type']) ? trim($_POST['type']) : '';
     $createdAt = date('Y-m-d H:i:s');
-    $reportDate = date('Y-m-d');
-    $filePath = null;
-
-    // Get admin_id from session
     $adminId = $_SESSION['admin_id'] ?? null;
 
     if (!$adminId) {
         $error_message = "Please log in again to continue.";
     } else {
-    // Prepare and execute insert query
-    $stmt = $conn->prepare("INSERT INTO admin_reports (title, description, category, report_date, file_path, admin_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        // Discover existing columns for safe/dynamic INSERT
+        $existing = [];
+        if ($cols = $conn->query("SHOW COLUMNS FROM admin_reports")) {
+            while ($row = $cols->fetch_assoc()) { $existing[strtolower($row['Field'])] = true; }
+            $cols->close();
+        }
 
-    if ($stmt === false) {
-            $error_message = "Prepare failed: " . $conn->error;
+        // Inputs
+        $title = trim((string)($_POST['title'] ?? ''));
+        $description = trim((string)($_POST['content'] ?? ''));
+        $category = trim((string)($_POST['type'] ?? ''));
+        $regNumber = trim((string)($_POST['regNumber'] ?? ''));
+        $status = trim((string)($_POST['status'] ?? 'open'));
+        $officer = trim((string)($_POST['officer'] ?? ''));
+        $reportDate = $_POST['report_date'] ?? date('Y-m-d');
+
+        if ($title === '' || $description === '' || $category === '') {
+            $error_message = 'Please fill in all required fields.';
         } else {
-    $stmt->bind_param("sssssis", $title, $description, $category, $reportDate, $filePath, $adminId, $createdAt);
+            // File upload (images/PDF)
+            $filePath = null;
+            if (!empty($_FILES['evidence']['name'])) {
+                $allowed = ['image/jpeg','image/png','image/gif','application/pdf'];
+                $tmp = $_FILES['evidence']['tmp_name'] ?? '';
+                $mime = $tmp && file_exists($tmp) ? @mime_content_type($tmp) : '';
+                if (!$tmp || !in_array($mime, $allowed, true)) {
+                    $error_message = 'Invalid file type. Allowed: JPG, PNG, GIF, PDF.';
+                } else {
+                    $ext = strtolower(pathinfo($_FILES['evidence']['name'], PATHINFO_EXTENSION));
+                    $safeName = 'report_' . date('Ymd_His') . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+                    $uploadDir = __DIR__ . '/uploads/reports';
+                    if (!is_dir($uploadDir)) { @mkdir($uploadDir, 0755, true); }
+                    $dest = $uploadDir . '/' . $safeName;
+                    if (move_uploaded_file($tmp, $dest)) {
+                        $filePath = 'uploads/reports/' . $safeName;
+                    } else {
+                        $error_message = 'Failed to upload file.';
+                    }
+                }
+            }
 
+            if (empty($error_message)) {
+                $columns = [];
+                $placeholders = [];
+                $values = [];
+                $types = '';
+
+                if (isset($existing['title'])) { $columns[] = 'title'; $placeholders[] = '?'; $values[] = $title; $types .= 's'; }
+                if (isset($existing['description'])) { $columns[] = 'description'; $placeholders[] = '?'; $values[] = $description; $types .= 's'; }
+                if (isset($existing['category'])) { $columns[] = 'category'; $placeholders[] = '?'; $values[] = $category; $types .= 's'; }
+                if (isset($existing['reg_number']) && $regNumber !== '') { $columns[] = 'reg_number'; $placeholders[] = '?'; $values[] = $regNumber; $types .= 's'; }
+                if (isset($existing['status'])) { $columns[] = 'status'; $placeholders[] = '?'; $values[] = $status; $types .= 's'; }
+                if (isset($existing['officer'])) { $columns[] = 'officer'; $placeholders[] = '?'; $values[] = $officer; $types .= 's'; }
+                if (isset($existing['report_date'])) { $columns[] = 'report_date'; $placeholders[] = '?'; $values[] = $reportDate; $types .= 's'; }
+                if (isset($existing['file_path']) && $filePath) { $columns[] = 'file_path'; $placeholders[] = '?'; $values[] = $filePath; $types .= 's'; }
+                if (isset($existing['admin_id'])) { $columns[] = 'admin_id'; $placeholders[] = '?'; $values[] = $adminId; $types .= 'i'; }
+                if (isset($existing['created_at'])) { $columns[] = 'created_at'; $placeholders[] = '?'; $values[] = $createdAt; $types .= 's'; }
+
+                if (count($columns) > 0) {
+                    $sql = 'INSERT INTO admin_reports (' . implode(', ', $columns) . ') VALUES (' . implode(', ', $placeholders) . ')';
+                    $stmt = $conn->prepare($sql);
+                    if ($stmt) {
+                        $stmt->bind_param($types, ...$values);
     if ($stmt->execute()) {
-                // Redirect to prevent form resubmission
-                header("Location: admin_reports.php?success=1");
+                            header('Location: admin_reports.php?success=1');
                 exit();
     } else {
-        $error_message = "Error creating report: " . $stmt->error;
+                            $error_message = 'Error creating report: ' . $stmt->error;
     }
-
     $stmt->close();
+                    } else {
+                        $error_message = 'Prepare failed: ' . $conn->error;
+                    }
+                } else {
+                    $error_message = 'No compatible columns found in admin_reports table.';
+                }
+            }
         }
     }
     $conn->close();
@@ -93,6 +144,9 @@ $conn->close();
     <?php includeCommonAssets(); ?>
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- DataTables + Buttons (for search, pagination, export) -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
     <style>
         :root {
             --primary-red: #d00000;
@@ -122,10 +176,7 @@ $conn->close();
             padding: 2rem;
         }
 
-        .header {
-            background: linear-gradient(90deg, rgba(208,0,0,1) 0%, rgba(176,0,0,1) 100%);
-            color: var(--white);
-        }
+        .header { background: linear-gradient(90deg, rgba(208,0,0,1) 0%, rgba(176,0,0,1) 100%); color: var(--white); }
 
         .header h1 {
             margin: 0;
@@ -175,16 +226,7 @@ $conn->close();
             transition: all 0.2s ease;
         }
 
-        .admin-nav a:hover {
-            background-color: var(--primary-red);
-            color: var(--white);
-        }
-
-        .admin-nav a.active {
-            background-color: var(--primary-red);
-            color: var(--white);
-            border-color: var(--primary-red);
-        }
+        /* admin nav hover/active handled by shared CSS */
 
         .report-form, .reports-list {
             background-color: var(--white);
@@ -193,6 +235,14 @@ $conn->close();
             margin-bottom: 2rem;
             box-shadow: var(--shadow-sm);
         }
+
+        .filters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .filters .form-input { padding: 0.5rem; }
 
         .form-group {
             margin-bottom: 1.5rem;
@@ -239,10 +289,7 @@ $conn->close();
             color: var(--white);
         }
 
-        .btn-primary:hover {
-            background-color: var(--primary-red-dark);
-            transform: translateY(-1px);
-        }
+        .btn-primary:hover { background-color: var(--primary-red-600); transform: translateY(-1px); }
 
         .btn-danger {
             background-color: #dc3545;
@@ -409,7 +456,7 @@ $conn->close();
 
         <div class="report-form">
             <h2>Create New Report</h2>
-            <form method="POST" action="" id="reportForm">
+            <form method="POST" action="" id="reportForm" enctype="multipart/form-data">
                 <input type="hidden" name="_token" value="<?= htmlspecialchars($csrfToken) ?>">
                 <div class="form-group">
                     <label for="title">Title</label>
@@ -425,43 +472,120 @@ $conn->close();
                     </select>
                 </div>
                 <div class="form-group">
+                    <label for="regNumber">Vehicle Registration Number</label>
+                    <input type="text" name="regNumber" id="regNumber" class="form-input" placeholder="e.g., ABC123" list="reg_suggestions">
+                    <datalist id="reg_suggestions">
+                        <?php
+                        try {
+                            $conn = getDBConnection();
+                            $rs = $conn->query("SELECT regNumber FROM vehicles ORDER BY regNumber ASC LIMIT 200");
+                            if ($rs) { while ($row = $rs->fetch_assoc()) { echo '<option value="'.htmlspecialchars($row['regNumber']).'"></option>'; } $rs->close(); }
+                            $conn->close();
+                        } catch (Exception $e) {}
+                        ?>
+                    </datalist>
+                </div>
+                <div class="form-group">
+                    <label for="report_date">Report Date</label>
+                    <input type="date" name="report_date" id="report_date" class="form-input" value="<?= date('Y-m-d') ?>">
+                </div>
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select name="status" id="status" class="form-input">
+                        <option value="open">Open</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="closed">Closed</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="officer">Officer In Charge</label>
+                    <input type="text" name="officer" id="officer" class="form-input" placeholder="Full name of officer">
+                </div>
+                <div class="form-group">
                     <label for="content">Content</label>
                     <textarea name="content" id="content" class="form-input" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="evidence">Attach Evidence (Images/PDF)</label>
+                    <input type="file" name="evidence" id="evidence" class="form-input" accept="image/*,application/pdf">
                 </div>
                 <button type="submit" class="btn btn-primary" id="submitBtn">Submit Report</button>
             </form>
         </div>
 
         <div class="reports-list">
-            <h2>Recent Reports</h2>
-            <?php if (empty($reports)): ?>
-                <p>No reports found.</p>
+            <h2>Reports</h2>
+            <div class="filters">
+                <input type="text" id="fltReg" class="form-input" placeholder="Filter by Reg Number">
+                <select id="fltType" class="form-input">
+                    <option value="">All Types</option>
+                    <option value="incident">Incident</option>
+                    <option value="maintenance">Maintenance</option>
+                    <option value="general">General</option>
+                </select>
+                <select id="fltStatus" class="form-input">
+                    <option value="">All Status</option>
+                    <option value="open">Open</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="closed">Closed</option>
+                </select>
+                <input type="date" id="fltFrom" class="form-input" placeholder="From">
+                <input type="date" id="fltTo" class="form-input" placeholder="To">
+            </div>
+            <div class="table-container">
+                <table id="reportsTable" class="table" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Type</th>
+                            <th>Reg Number</th>
+                            <th>Status</th>
+                            <th>Officer</th>
+                            <th>Report Date</th>
+                            <th>Created</th>
+                            <th>Evidence</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (!empty($reports)): ?>
+                            <?php foreach ($reports as $r): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($r['title'] ?? '') ?></td>
+                                    <td><?= htmlspecialchars($r['category'] ?? '') ?></td>
+                                    <td><?= htmlspecialchars($r['reg_number'] ?? '') ?></td>
+                                    <td><?= htmlspecialchars($r['status'] ?? '') ?></td>
+                                    <td><?= htmlspecialchars($r['officer'] ?? '') ?></td>
+                                    <td><?= htmlspecialchars($r['report_date'] ?? '') ?></td>
+                                    <td><?= htmlspecialchars($r['created_at'] ?? '') ?></td>
+                                    <td>
+                                        <?php if (!empty($r['file_path'])): ?>
+                                            <a href="<?= htmlspecialchars($r['file_path']) ?>" target="_blank" class="btn btn-secondary" style="padding:.35rem .75rem;">View</a>
             <?php else: ?>
-                <?php foreach ($reports as $report): ?>
-                    <div class="report-card">
-                        <div class="report-title">
-                            <?= htmlspecialchars($report['title']) ?>
-                            <span class="report-type-badge type-<?= htmlspecialchars($report['category']) ?>">
-                                <?= ucfirst(htmlspecialchars($report['category'])) ?>
-                            </span>
-                        </div>
-                        <div class="report-meta">
-                            Admin ID: <?= htmlspecialchars($report['admin_id']) ?> | 
-                            Created on: <?= date("M j, Y g:i A", strtotime($report['created_at'])) ?>
-                        </div>
-                        <div class="report-content">
-                            <?= nl2br(htmlspecialchars($report['description'])) ?>
-                        </div>
-                        <div class="report-actions">
-                            <button class="btn btn-primary" onclick="window.location.href='edit_report.php?id=<?= $report['id'] ?>'">Edit</button>
-                            <button class="btn btn-danger" onclick="deleteReport(<?= $report['id'] ?>)">Delete</button>
-                        </div>
-                    </div>
+                                            —
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="action-buttons">
+                                        <button class="btn btn-primary btn-icon" onclick="window.location.href='edit_report.php?id=<?= (int)($r['id'] ?? 0) ?>'"><i class="fas fa-pen"></i> Edit</button>
+                                        <button class="btn btn-danger btn-icon" onclick="deleteReport(<?= (int)($r['id'] ?? 0) ?>)"><i class="fas fa-trash"></i> Delete</button>
+                                    </td>
+                                </tr>
                 <?php endforeach; ?>
             <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.8/js/dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
     <script>
         function logout() { window.location.href = 'logout.php'; }
         // Prevent form resubmission
@@ -512,6 +636,59 @@ $conn->close();
                 });
             }
         }
+
+        // Initialize DataTable with export buttons and column filters
+        document.addEventListener('DOMContentLoaded', function() {
+            const table = new DataTable('#reportsTable', {
+                dom: 'Bfrtip',
+                buttons: [
+                    { extend: 'csvHtml5', title: 'Reports' },
+                    { extend: 'excelHtml5', title: 'Reports' },
+                    { extend: 'pdfHtml5', title: 'Reports', orientation: 'landscape', pageSize: 'A4' },
+                    { extend: 'print', title: 'Reports' }
+                ],
+                order: [[6, 'desc']],
+                pageLength: 10
+            });
+
+            // Filters
+            const fltReg = document.getElementById('fltReg');
+            const fltType = document.getElementById('fltType');
+            const fltStatus = document.getElementById('fltStatus');
+            const fltFrom = document.getElementById('fltFrom');
+            const fltTo = document.getElementById('fltTo');
+
+            function applyFilters() {
+                table.column(2).search(fltReg.value || '');
+                table.column(1).search(fltType.value || '');
+                table.column(3).search(fltStatus.value || '');
+                // Date range filter on report date (column 5)
+                const from = fltFrom.value ? new Date(fltFrom.value) : null;
+                const to = fltTo.value ? new Date(fltTo.value) : null;
+                table.column(5).search(''); // reset
+                table.draw();
+                // Custom filtering for date range
+            }
+
+            [fltReg, fltType, fltStatus, fltFrom, fltTo].forEach(el => {
+                el && el.addEventListener('change', applyFilters);
+                el && el.addEventListener('keyup', applyFilters);
+            });
+
+            // Custom date range filtering
+            DataTable.ext.search.push(function(settings, data) {
+                if (settings.nTable !== document.getElementById('reportsTable')) return true;
+                const from = fltFrom.value ? new Date(fltFrom.value) : null;
+                const to = fltTo.value ? new Date(fltTo.value) : null;
+                const dateStr = data[5] || '';
+                const rowDate = dateStr ? new Date(dateStr) : null;
+                if (!from && !to) return true;
+                if (rowDate === null || isNaN(rowDate)) return false;
+                if (from && rowDate < from) return false;
+                if (to && rowDate > to) return false;
+                return true;
+            });
+        });
     </script>
 </body>
 </html>

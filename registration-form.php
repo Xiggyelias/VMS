@@ -800,7 +800,163 @@ $csrfToken = SecurityMiddleware::generateCSRFToken();
         // Add initial driver section to first vehicle
         document.addEventListener('DOMContentLoaded', () => {
             addDriver(0);
+            loadDraft(); // Load saved draft if exists
+            setupAutoSave(); // Setup autosave functionality
         });
+
+        // Load saved draft data
+        function loadDraft() {
+            fetch('get_registration_draft.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.draft) {
+                        populateFormWithDraft(data.draft);
+                        showAlert('Your previous progress has been loaded. You can continue from where you left off.', 'info');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading draft:', error);
+                });
+        }
+
+        // Populate form with draft data
+        function populateFormWithDraft(draft) {
+            // Basic form fields
+            if (draft.registrantType) {
+                document.getElementById('registrantType').value = draft.registrantType;
+                updateFormVisibility();
+            }
+            if (draft.studentRegNo) document.getElementById('studentRegNo').value = draft.studentRegNo;
+            if (draft.staffsregno) document.getElementById('staffsregno').value = draft.staffsregno;
+            if (draft.college) document.getElementById('college').value = draft.college;
+            if (draft.idNumber) document.getElementById('idNumber').value = draft.idNumber;
+            if (draft.licenseNumber) document.getElementById('licenseNumber').value = draft.licenseNumber;
+            if (draft.licenseClass) document.getElementById('licenseClass').value = draft.licenseClass;
+            if (draft.licenseDate) document.getElementById('licenseDate').value = draft.licenseDate;
+
+            // Vehicles
+            if (draft.vehicles && draft.vehicles.length > 0) {
+                // Remove existing vehicles except the first one
+                const vehicleSections = document.querySelectorAll('.vehicle-section');
+                for (let i = 1; i < vehicleSections.length; i++) {
+                    vehicleSections[i].remove();
+                }
+
+                draft.vehicles.forEach((vehicle, index) => {
+                    if (index > 0) {
+                        addVehicle(); // Add new vehicle section
+                    }
+                    
+                    const vehicleSection = document.querySelectorAll('.vehicle-section')[index];
+                    if (vehicleSection) {
+                        if (vehicle.regNumber) vehicleSection.querySelector('[name*="[regNumber]"]').value = vehicle.regNumber;
+                        if (vehicle.make) vehicleSection.querySelector('[name*="[make]"]').value = vehicle.make;
+                        if (vehicle.owner) vehicleSection.querySelector('[name*="[owner]"]').value = vehicle.owner;
+                        if (vehicle.address) vehicleSection.querySelector('[name*="[address]"]').value = vehicle.address;
+                        if (vehicle.PlateNumber) vehicleSection.querySelector('[name*="[PlateNumber]"]').value = vehicle.PlateNumber;
+
+                        // Drivers for this vehicle
+                        if (vehicle.drivers && vehicle.drivers.length > 0) {
+                            // Remove existing drivers
+                            const driverCards = vehicleSection.querySelectorAll('.driver-card');
+                            driverCards.forEach(card => card.remove());
+
+                            vehicle.drivers.forEach((driver, driverIndex) => {
+                                if (driverIndex > 0) {
+                                    addDriver(index);
+                                }
+                                
+                                const driverCards = vehicleSection.querySelectorAll('.driver-card');
+                                const driverCard = driverCards[driverIndex];
+                                if (driverCard) {
+                                    if (driver.fullName) driverCard.querySelector('[name*="[fullName]"]').value = driver.fullName;
+                                    if (driver.licenseNumber) driverCard.querySelector('[name*="[licenseNumber]"]').value = driver.licenseNumber;
+                                    if (driver.contact) driverCard.querySelector('[name*="[contact]"]').value = driver.contact;
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+        }
+
+        // Setup autosave functionality
+        function setupAutoSave() {
+            let saveTimeout;
+            const form = document.getElementById('registrationForm');
+            
+            // Save draft every 30 seconds when user is typing
+            form.addEventListener('input', () => {
+                clearTimeout(saveTimeout);
+                saveTimeout = setTimeout(saveDraft, 30000); // 30 seconds delay
+            });
+
+            // Save draft when user leaves the page
+            window.addEventListener('beforeunload', () => {
+                saveDraft();
+            });
+        }
+
+        // Save current form data as draft
+        function saveDraft() {
+            const formData = new FormData(document.getElementById('registrationForm'));
+            const draftData = {
+                registrantType: formData.get('registrantType'),
+                studentRegNo: formData.get('studentRegNo'),
+                staffsregno: formData.get('staffsregno'),
+                college: formData.get('college'),
+                idNumber: formData.get('idNumber'),
+                licenseNumber: formData.get('licenseNumber'),
+                licenseClass: formData.get('licenseClass'),
+                licenseDate: formData.get('licenseDate'),
+                vehicles: []
+            };
+
+            // Collect vehicles data
+            const vehicleSections = document.querySelectorAll('.vehicle-section');
+            vehicleSections.forEach((section, vehicleIndex) => {
+                const vehicle = {
+                    regNumber: formData.get(`vehicles[${vehicleIndex}][regNumber]`),
+                    make: formData.get(`vehicles[${vehicleIndex}][make]`),
+                    owner: formData.get(`vehicles[${vehicleIndex}][owner]`),
+                    address: formData.get(`vehicles[${vehicleIndex}][address]`),
+                    PlateNumber: formData.get(`vehicles[${vehicleIndex}][PlateNumber]`),
+                    drivers: []
+                };
+
+                // Collect drivers data
+                const driverCards = section.querySelectorAll('.driver-card');
+                driverCards.forEach((card, driverIndex) => {
+                    const driver = {
+                        fullName: formData.get(`vehicles[${vehicleIndex}][drivers][${driverIndex}][fullName]`),
+                        licenseNumber: formData.get(`vehicles[${vehicleIndex}][drivers][${driverIndex}][licenseNumber]`),
+                        contact: formData.get(`vehicles[${vehicleIndex}][drivers][${driverIndex}][contact]`)
+                    };
+                    vehicle.drivers.push(driver);
+                });
+
+                draftData.vehicles.push(vehicle);
+            });
+
+            // Send draft data to server
+            fetch('save_registration_draft.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': '<?= htmlspecialchars($csrfToken) ?>'
+                },
+                body: JSON.stringify(draftData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Draft saved successfully');
+                }
+            })
+            .catch(error => {
+                console.error('Error saving draft:', error);
+            });
+        }
 
         // Add new functions for help modals
         function showHelpModal(type) {

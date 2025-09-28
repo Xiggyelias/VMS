@@ -17,7 +17,7 @@ require_once INCLUDES_PATH . '/functions/utilities.php';
  * 
  * @param string $identifier User's email address or registration number
  * @param string $password User's password
- * @param string $userType Type of user (student, staff, guest)
+ * @param string $userType Type of user (student, staff)
  * @return array Array with 'success' boolean and 'message' string
  */
 function userLogin($identifier, $password, $userType) {
@@ -38,13 +38,7 @@ function userLogin($identifier, $password, $userType) {
                 $stmt = $conn->prepare("SELECT * FROM applicants WHERE (staffsRegNo = ? OR Email = ?) AND registrantType = 'staff'");
                 $stmt->bind_param("ss", $identifier, $identifier);
                 break;
-            case 'guest':
-                if (!isValidEmail($identifier)) {
-                    return ['success' => false, 'message' => 'Invalid email address.'];
-                }
-                $stmt = $conn->prepare("SELECT * FROM applicants WHERE Email = ? AND registrantType = 'guest'");
-                $stmt->bind_param("s", $identifier);
-                break;
+            // guest removed
             default:
                 return ['success' => false, 'message' => 'Invalid user type.'];
         }
@@ -270,8 +264,18 @@ function getCurrentUserName() {
  */
 function requireAuth($redirectUrl = null) {
     if (!isLoggedIn()) {
-        $redirectUrl = $redirectUrl ?: getCurrentUrl();
-        redirect(BASE_URL . '/login.php?redirect=' . urlencode($redirectUrl));
+        // Check if the request is an API call expecting JSON
+        $isApiRequest = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') || 
+                        (strpos($_SERVER['REQUEST_URI'], '/api/') !== false) || 
+                        (isset($_SERVER['HTTP_ACCEPT']) && strpos(strtolower($_SERVER['HTTP_ACCEPT']), 'application/json') !== false);
+
+        if ($isApiRequest) {
+            http_response_code(401); // Unauthorized
+            throw new Exception('Authentication required. Please log in.');
+        } else {
+            $redirectUrl = $redirectUrl ?: getCurrentUrl();
+            redirect(BASE_URL . '/login.php?redirect=' . urlencode($redirectUrl));
+        }
     }
 }
 
@@ -347,11 +351,7 @@ function getUserPermissions() {
             $permissions['can_manage_drivers'] = true;
             break;
             
-        case 'guest':
-            $permissions['can_register_vehicles'] = true;
-            $permissions['max_vehicles'] = MAX_VEHICLES_PER_GUEST;
-            $permissions['can_manage_drivers'] = true;
-            break;
+        // guest removed
     }
     
     // Admin has all permissions

@@ -7,6 +7,56 @@
  * at the beginning of all PHP pages.
  */
 
+// Set error handling
+set_error_handler(function($severity, $message, $file, $line) {
+    if (!(error_reporting() & $severity)) {
+        return;
+    }
+    throw new ErrorException($message, 0, $severity, $file, $line);
+});
+
+// Set exception handler
+set_exception_handler(function($exception) {
+    logError("Uncaught Exception: " . $exception->getMessage(), 'ERROR', [
+        'file' => $exception->getFile(),
+        'line' => $exception->getLine(),
+        'trace' => $exception->getTraceAsString()
+    ]);
+
+    // Check if the request is an API call expecting JSON
+    $isApiRequest = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') || 
+                    (strpos($_SERVER['REQUEST_URI'], '/api/') !== false) || 
+                    (isset($_SERVER['HTTP_ACCEPT']) && strpos(strtolower($_SERVER['HTTP_ACCEPT']), 'application/json') !== false);
+
+    if ($isApiRequest) {
+        header('Content-Type: application/json');
+        http_response_code(500);
+        $errorDetails = [
+            'success' => false,
+            'message' => 'A server error occurred.'
+        ];
+        if (isDevelopment()) {
+            $errorDetails['error'] = $exception->getMessage();
+            $errorDetails['file'] = $exception->getFile();
+            $errorDetails['line'] = $exception->getLine();
+        }
+        echo json_encode($errorDetails);
+    } else {
+        if (isDevelopment()) {
+            echo '<div class="alert alert-danger">';
+            echo '<strong>Error:</strong> ' . htmlspecialchars($exception->getMessage()) . '<br>';
+            echo '<strong>File:</strong> ' . htmlspecialchars($exception->getFile()) . '<br>';
+            echo '<strong>Line:</strong> ' . $exception->getLine();
+            echo '</div>';
+        } else {
+            // Avoid breaking the layout on production
+            if (ob_get_level()) ob_clean(); // Clear any previous output
+            include __DIR__ . '/../error-500.php'; // Show a generic error page
+        }
+    }
+    exit;
+});
+
 // Start output buffering for better performance
 ob_start();
 
@@ -37,33 +87,6 @@ if (file_exists(__DIR__ . '/functions/email.php')) {
 if (file_exists(__DIR__ . '/functions/notifications.php')) {
     require_once __DIR__ . '/functions/notifications.php';
 }
-
-// Set error handling
-set_error_handler(function($severity, $message, $file, $line) {
-    if (!(error_reporting() & $severity)) {
-        return;
-    }
-    throw new ErrorException($message, 0, $severity, $file, $line);
-});
-
-// Set exception handler
-set_exception_handler(function($exception) {
-    logError("Uncaught Exception: " . $exception->getMessage(), 'ERROR', [
-        'file' => $exception->getFile(),
-        'line' => $exception->getLine(),
-        'trace' => $exception->getTraceAsString()
-    ]);
-    
-    if (isDevelopment()) {
-        echo '<div class="alert alert-danger">';
-        echo '<strong>Error:</strong> ' . htmlspecialchars($exception->getMessage()) . '<br>';
-        echo '<strong>File:</strong> ' . htmlspecialchars($exception->getFile()) . '<br>';
-        echo '<strong>Line:</strong> ' . $exception->getLine();
-        echo '</div>';
-    } else {
-        echo '<div class="alert alert-danger">An error occurred. Please try again later.</div>';
-    }
-});
 
 // Check session timeout
 if (isLoggedIn()) {

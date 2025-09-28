@@ -26,6 +26,21 @@ $stmt->execute();
 $user = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
+// Gate: per requirement, only force setup for Student users missing a valid 6-digit reg number
+$needsSetup = false;
+if ($user) {
+    $type = strtolower(trim($user['registrantType'] ?? ''));
+    if ($type === 'student') {
+        $needsSetup = !preg_match('/^\d{6}$/', (string)($user['studentRegNo'] ?? ''));
+    }
+}
+
+if ($needsSetup) {
+    // Redirect back to login to trigger role selection
+    header('Location: login.php?requires_type_selection=1');
+    exit();
+}
+
 // Get registrant type
 $registrantType = $user['registrantType'] ?? 'guest';
 
@@ -91,6 +106,7 @@ $csrfToken = SecurityMiddleware::generateCSRFToken();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Dashboard - Vehicle Registration System</title>
     <?php includeCommonAssets(); ?>
+    <meta name="csrf-token" content="<?= htmlspecialchars($csrfToken) ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         .header-content {
@@ -637,6 +653,7 @@ $csrfToken = SecurityMiddleware::generateCSRFToken();
         <div class="management-section">
             <div class="management-header">
                 <h2>Vehicle Owner Information</h2>
+                <button class="btn btn-primary" onclick="openModal('editOwnerModal')"><i class="fas fa-pen"></i> Edit Info</button>
             </div>
             <div class="owner-info">
     <div class="info-item">
@@ -663,11 +680,11 @@ $csrfToken = SecurityMiddleware::generateCSRFToken();
         <!-- Statistics Overview -->
         <div class="user-stats">
             <div class="stat-box">
-                <div class="stat-number"><?= $vehicle_count ?></div>
+                <div id="vehiclesCount" class="stat-number"><?= $vehicle_count ?></div>
                 <div class="stat-label">My Registered Vehicles</div>
             </div>
             <div class="stat-box">
-                <div class="stat-number"><?= $driver_count ?></div>
+                <div id="driversCount" class="stat-number"><?= $driver_count ?></div>
                 <div class="stat-label">Authorized Drivers</div>
             </div>
         </div>
@@ -692,7 +709,7 @@ $csrfToken = SecurityMiddleware::generateCSRFToken();
                     <tbody>
                         <?php if (count($vehicles) > 0): ?>
                             <?php foreach ($vehicles as $vehicle): ?>
-                                <tr>
+                                <tr id="vehicle-<?= (int)$vehicle['vehicle_id'] ?>">
                                     <td><?= htmlspecialchars($vehicle['make'] ?? '—') ?></td>
                                     <td><?= htmlspecialchars($vehicle['regNumber'] ?? '—') ?></td>
                                     <td>
@@ -748,7 +765,7 @@ $csrfToken = SecurityMiddleware::generateCSRFToken();
                     <tbody>
                         <?php if (!empty($drivers)): ?>
                             <?php foreach ($drivers as $driver): ?>
-                                <tr>
+                                <tr id="driver-row-<?= (int)$driver['Id'] ?>">
                                     <td><?= htmlspecialchars($driver['fullname']) ?></td>
                                     <td><?= htmlspecialchars($driver['licenseNumber']) ?></td>
                                     <td><?= htmlspecialchars($driver['contact'] ?? 'N/A') ?></td>
@@ -824,7 +841,7 @@ $csrfToken = SecurityMiddleware::generateCSRFToken();
             </div>
             <div id="editVehicleAlert" class="alert"></div>
             <form id="editVehicleForm" onsubmit="return handleEditVehicleSubmit(event)">
-                <input type="hidden" id="edit_vehicle_id" name="vehicle_id">
+                <input type="hidden" id="edit_vehicle_id" name="id">
                 <div class="form-group">
                     <label for="edit_make">Vehicle Make <span class="required">*</span></label>
                     <input type="text" id="edit_make" name="make" class="form-input" required 
@@ -888,24 +905,132 @@ $csrfToken = SecurityMiddleware::generateCSRFToken();
         </div>
     </div>
 
+    <!-- Edit Owner Info Modal -->
+    <div id="editOwnerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Owner Information</h2>
+                <button type="button" class="close" onclick="closeModal('editOwnerModal')">&times;</button>
+            </div>
+            <div id="ownerAlert" class="alert"></div>
+            <form id="editOwnerForm" onsubmit="return handleOwnerSubmit(event)">
+                <div class="form-group">
+                    <label for="owner_fullName">Full Name <span class="required">*</span></label>
+                    <input type="text" id="owner_fullName" name="fullName" class="form-input" required 
+                           value="<?= htmlspecialchars($user['fullName'] ?? '') ?>">
+                </div>
+                <div class="form-group">
+                    <label for="owner_idNumber">ID/Passport</label>
+                    <input type="text" id="owner_idNumber" name="idNumber" class="form-input" 
+                           value="<?= htmlspecialchars($user['idNumber'] ?? '') ?>">
+                </div>
+                <div class="form-group">
+                    <label for="owner_phone">Phone Number</label>
+                    <input type="tel" id="owner_phone" name="phone" class="form-input" 
+                           value="<?= htmlspecialchars($user['phone'] ?? '') ?>">
+                </div>
+                <?php if (strtolower($registrantType) !== 'guest'): ?>
+                <div class="form-group">
+                    <label for="owner_college">College</label>
+                    <input type="text" id="owner_college" name="college" class="form-input" 
+                           value="<?= htmlspecialchars($user['college'] ?? '') ?>">
+                </div>
+                <?php endif; ?>
+                <input type="hidden" name="_token" value="<?= htmlspecialchars($csrfToken) ?>">
+                <div class="modal-buttons">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('editOwnerModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="loading-spinner"></span>
+                        <span class="button-text" data-original-text="Save Changes">Save Changes</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         function logout() {
             window.location.href = 'logout.php';
         }
 
-        function showAlert(modalId, message, type) {
-            const alertDiv = document.getElementById(`${modalId}Alert`);
-            alertDiv.className = `alert alert-${type}`;
-            alertDiv.textContent = message;
-            alertDiv.style.display = 'block';
-            
-            // Scroll to alert
-            alertDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            
-            // Hide alert after 5 seconds
-            setTimeout(() => {
-                alertDiv.style.display = 'none';
-            }, 5000);
+        // ---------- Live UI helpers ----------
+        function setCount(elId, newVal) {
+            const el = document.getElementById(elId);
+            if (el) el.textContent = String(newVal);
+        }
+        function getCount(elId) {
+            const el = document.getElementById(elId);
+            return el ? parseInt(el.textContent || '0', 10) || 0 : 0;
+        }
+        function incCount(elId, delta) {
+            setCount(elId, getCount(elId) + delta);
+        }
+        function ensureEmptyRow(tableSelector, colSpan, message) {
+            const tbody = document.querySelector(tableSelector);
+            if (!tbody) return;
+            const hasRows = tbody.querySelectorAll('tr').length > 0;
+            if (!hasRows) {
+                const tr = document.createElement('tr');
+                const td = document.createElement('td');
+                td.colSpan = colSpan;
+                td.className = 'text-center';
+                td.textContent = message;
+                tr.appendChild(td);
+                tbody.appendChild(tr);
+            }
+        }
+
+        function showAlert(type, message, modalId = null) {
+            try {
+                // Default to the main alert box if no modalId is provided
+                const alertId = modalId ? `${modalId}Alert` : 'alertBox';
+                let alertBox = document.getElementById(alertId);
+                
+                // Create alert box if it doesn't exist
+                if (!alertBox) {
+                    // Try to find a container for the alert
+                    let container = document.querySelector('.modal-content');
+                    if (!container) {
+                        container = document.body;
+                    }
+                    
+                    // Create the alert element
+                    alertBox = document.createElement('div');
+                    alertBox.id = alertId;
+                    alertBox.className = type === 'success' ? 'alert alert-success' : 'alert alert-danger';
+                    alertBox.style.display = 'block';
+                    alertBox.style.margin = '10px';
+                    alertBox.style.padding = '10px';
+                    alertBox.style.borderRadius = '4px';
+                    
+                    // Prepend to container or append to body
+                    if (container) {
+                        container.prepend(alertBox);
+                    } else {
+                        document.body.prepend(alertBox);
+                    }
+                }
+                
+                // Update alert content and style
+                alertBox.className = type === 'success' ? 'alert alert-success' : 'alert alert-danger';
+                alertBox.textContent = message;
+                alertBox.style.display = 'block';
+                
+                // Ensure alert is visible
+                alertBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                // Hide alert after 5 seconds
+                setTimeout(() => {
+                    if (alertBox) {
+                        alertBox.style.display = 'none';
+                    }
+                }, 5000);
+                
+            } catch (error) {
+                console.error('Error showing alert:', error);
+                // Fallback to browser alert if something goes wrong
+                alert(`${type.toUpperCase()}: ${message}`);
+            }
         }
 
         function showLoading(button) {
@@ -927,26 +1052,8 @@ $csrfToken = SecurityMiddleware::generateCSRFToken();
         function openModal(modalId) {
             document.getElementById(modalId).style.display = 'block';
             document.body.style.overflow = 'hidden';
-            
-            // Reset form and alert if it's the vehicle modal
-            if (modalId === 'addVehicleModal') {
-                document.getElementById('addVehicleForm').reset();
-                document.getElementById('vehicleAlert').style.display = 'none';
-            }
-            
-            // Scroll to top of modal
+            // Scroll modal to top
             document.querySelector('.modal-content').scrollTop = 0;
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-            document.body.style.overflow = 'auto';
-            
-            // Reset form and alert if it's the vehicle modal
-            if (modalId === 'addVehicleModal') {
-                document.getElementById('addVehicleForm').reset();
-                document.getElementById('vehicleAlert').style.display = 'none';
-            }
         }
 
         function showVehicleAlert(message, type) {
@@ -982,20 +1089,46 @@ $csrfToken = SecurityMiddleware::generateCSRFToken();
 
             const formData = new FormData(form);
             formData.append('action', 'add');
+            formData.append('_token', '<?= htmlspecialchars($csrfToken) ?>');
 
             fetch('vehicle_operations.php', {
                 method: 'POST',
-                headers: { 'X-CSRF-Token': '<?= htmlspecialchars($csrfToken) ?>' },
+                headers: { 'X-CSRF-Token': '<?= htmlspecialchars($csrfToken) ?>', 'Accept': 'application/json' },
+                credentials: 'same-origin',
                 body: formData
             })
             .then(response => response.json())
             .then(data => {
                 hideLoading(submitButton);
-                if (data.success) {
-                    showVehicleAlert(data.message, 'success');
-                    setTimeout(() => {
-                        location.reload();
-                    }, 1500);
+                if (data.status === 'success' || data.success === true) {
+                    showVehicleAlert(data.message || 'Vehicle added.', 'success');
+                    // Update count immediately
+                    incCount('vehiclesCount', 1);
+                    // Insert a new row if API returned an id; otherwise leave as-is
+                    const tbody = document.querySelector('table.table tbody');
+                    if (tbody && data.vehicle) {
+                        // Remove empty row if present
+                        tbody.querySelectorAll('tr').forEach(tr => {
+                            if (tr.querySelector('td') && tr.children.length === 1 && tr.textContent.includes('No registered vehicles')) tr.remove();
+                        });
+                        const v = data.vehicle;
+                        const tr = document.createElement('tr');
+                        tr.id = 'vehicle-' + v.vehicle_id;
+                        tr.innerHTML = `
+                            <td>${(v.make || '—')}</td>
+                            <td>${(v.regNumber || '—')}</td>
+                            <td><span class="status-badge status-${(v.status || 'inactive')}">${(v.status || 'Inactive').charAt(0).toUpperCase() + (v.status || 'Inactive').slice(1)}</span></td>
+                            <td><div class="last-updated">${v.formatted_last_updated || ''}</div></td>
+                            <td class="action-buttons">
+                                <button class="btn btn-primary btn-icon" onclick="editVehicle(${v.vehicle_id}, '${(v.make || '').replace(/'/g, "&#39;")}', '${(v.regNumber || '').replace(/'/g, "&#39;")}')"><i class="fas fa-pen"></i> Edit</button>
+                                <button class="btn btn-danger btn-icon" onclick="deleteVehicle(${v.vehicle_id})"><i class="fas fa-trash"></i> Delete</button>
+                            </td>
+                        `;
+                        tbody.prepend(tr);
+                    }
+                    // Close modal and reset form
+                    form.reset();
+                    closeModal('addVehicleModal');
                 } else {
                     showVehicleAlert(data.message || 'An error occurred. Please try again.', 'danger');
                 }
@@ -1009,33 +1142,43 @@ $csrfToken = SecurityMiddleware::generateCSRFToken();
             return false;
         }
 
-        function deleteVehicle(vehicleId) {
-            if (confirm('Are you sure you want to delete this vehicle?')) {
-                const formData = new FormData();
-                formData.append('action', 'delete');
-                formData.append('vehicle_id', vehicleId);
+        function deleteVehicle(id) {
+            if (!confirm('Are you sure you want to delete this vehicle?')) return;
 
-                fetch('vehicle_operations.php', {
-                    method: 'POST',
-                    headers: { 'X-CSRF-Token': '<?= htmlspecialchars($csrfToken) ?>' },
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showVehicleAlert(data.message, 'success');
-                        setTimeout(() => {
-                            location.reload();
-                        }, 1500);
+            const row = document.getElementById('vehicle-' + id);
+            const originalBg = row ? row.style.backgroundColor : '';
+            if (row) { row.style.backgroundColor = '#fff3cd'; }
+
+            const body = new URLSearchParams({ action: 'delete', id: String(id), _token: '<?= htmlspecialchars($csrfToken) ?>' });
+
+            fetch('vehicle_operations.php', {
+                method: 'POST',
+                headers: { 'X-CSRF-Token': '<?= htmlspecialchars($csrfToken) ?>', 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' },
+                credentials: 'same-origin',
+                body: body.toString()
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success' || data.success === true) {
+                    if (row) {
+                        row.style.transition = 'opacity .25s ease, height .25s ease';
+                        row.style.opacity = '0';
+                        setTimeout(() => { if (row && row.parentNode) row.parentNode.removeChild(row); ensureEmptyRow('table.table tbody', 5, 'No registered vehicles found.'); }, 300);
                     } else {
-                        showVehicleAlert(data.message, 'danger');
+                        ensureEmptyRow('table.table tbody', 5, 'No registered vehicles found.');
                     }
-                })
-                .catch(error => {
-                    showVehicleAlert('An error occurred. Please try again.', 'danger');
-                    console.error('Error:', error);
-                });
-            }
+                    // Decrement count immediately
+                    incCount('vehiclesCount', -1);
+                } else {
+                    if (row) row.style.backgroundColor = originalBg;
+                    showVehicleAlert(data.message || 'Delete failed', 'danger');
+                }
+            })
+            .catch(error => {
+                if (row) row.style.backgroundColor = originalBg;
+                console.error('Error:', error);
+                showVehicleAlert('An error occurred. Please try again.', 'danger');
+            });
         }
 
         // Close modal when clicking outside
@@ -1123,20 +1266,45 @@ $csrfToken = SecurityMiddleware::generateCSRFToken();
             const formData = new FormData(form);
             const isEdit = formData.get('driver_id') !== '';
             formData.append('action', isEdit ? 'edit' : 'add');
+            formData.append('_token', '<?= htmlspecialchars($csrfToken) ?>');
 
             fetch('driver_operations.php', {
                 method: 'POST',
                 headers: { 'X-CSRF-Token': '<?= htmlspecialchars($csrfToken) ?>' },
+                credentials: 'same-origin',
                 body: formData
             })
             .then(response => response.json())
             .then(data => {
                 hideLoading(submitButton);
-                if (data.success) {
-                    showDriverAlert(data.message, 'success');
-                    setTimeout(() => {
-                        location.reload();
-                    }, 1500);
+                if (data.status === 'success' || data.success) {
+                    showDriverAlert(data.message || 'Saved', 'success');
+                    const tbody = document.querySelector('#driverModal').closest('.management-section').querySelector('table tbody');
+                    // Update count if adding
+                    const isEdit = (form.querySelector('#driver_id').value || '') !== '';
+                    if (!isEdit) incCount('driversCount', 1);
+                    if (tbody && data.driver) {
+                        // Remove empty row if present
+                        tbody.querySelectorAll('tr').forEach(tr => {
+                            if (tr.querySelector('td') && tr.children.length === 1 && tr.textContent.includes('No authorized drivers')) tr.remove();
+                        });
+                        const d = data.driver;
+                        let tr = document.getElementById('driver-row-' + d.Id);
+                        if (!tr) {
+                            tr = document.createElement('tr');
+                            tr.id = 'driver-row-' + d.Id;
+                            tbody.prepend(tr);
+                        }
+                        tr.innerHTML = `
+                            <td>${(d.fullname || '')}</td>
+                            <td>${(d.licenseNumber || '')}</td>
+                            <td>${(d.contact || 'N/A')}</td>
+                            <td class="action-buttons">
+                                <button class="btn btn-primary btn-icon" onclick="editDriver(${d.Id}, '${(d.fullname || '').replace(/'/g, "&#39;")}', '${(d.licenseNumber || '').replace(/'/g, "&#39;")}', '${(d.contact || '').replace(/'/g, "&#39;")}')"><i class=\"fas fa-pen\"></i> Edit</button>
+                                <button class="btn btn-danger btn-icon" onclick="deleteDriver(${d.Id})"><i class=\"fas fa-trash\"></i> Delete</button>
+                            </td>`;
+                    }
+                    closeDriverModal();
                 } else {
                     showDriverAlert(data.message || 'An error occurred. Please try again.', 'danger');
                 }
@@ -1151,32 +1319,46 @@ $csrfToken = SecurityMiddleware::generateCSRFToken();
         }
 
         function deleteDriver(driverId) {
-            if (confirm('Are you sure you want to delete this driver?')) {
-                const formData = new FormData();
-                formData.append('action', 'delete');
-                formData.append('driver_id', driverId);
+            if (!confirm('Are you sure you want to delete this driver?')) return;
 
-                fetch('driver_operations.php', {
-                    method: 'POST',
-                    headers: { 'X-CSRF-Token': '<?= htmlspecialchars($csrfToken) ?>' },
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showDriverAlert(data.message, 'success');
-                        setTimeout(() => {
-                            location.reload();
-                        }, 1500);
-                    } else {
-                        showDriverAlert(data.message, 'danger');
-                    }
-                })
-                .catch(error => {
-                    showDriverAlert('An error occurred. Please try again.', 'danger');
-                    console.error('Error:', error);
-                });
-            }
+            const token = '<?= htmlspecialchars($csrfToken) ?>';
+            const body = new URLSearchParams({ action: 'delete_driver', id: String(driverId), _token: '<?= htmlspecialchars($csrfToken) ?>' });
+
+            const deleteButton = document.querySelector(`button[onclick*="deleteDriver(${driverId})"]`);
+            const originalHtml = deleteButton ? deleteButton.innerHTML : null;
+            if (deleteButton) { deleteButton.disabled = true; deleteButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...'; }
+
+            fetch('vehicle_operations.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Accept': 'application/json',
+                    'X-CSRF-Token': token
+                },
+                credentials: 'same-origin',
+                body: body.toString()
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data && (data.success || data.status === 'success')) {
+                    // Remove row without page refresh
+                    const row = document.getElementById('driver-row-' + driverId);
+                    if (row) row.remove();
+                    // Decrement count immediately
+                    incCount('driversCount', -1);
+                    ensureEmptyRow('#driverModal .management-section table tbody', 4, 'No authorized drivers found.');
+                    showAlert('success', data.message || 'Driver deleted');
+                } else {
+                    throw new Error((data && data.message) || 'Delete failed');
+                }
+            })
+            .catch(err => {
+                console.error('Delete error:', err);
+                showAlert('error', err.message || 'Failed to delete driver.');
+            })
+            .finally(() => {
+                if (deleteButton) { deleteButton.disabled = false; deleteButton.innerHTML = originalHtml || 'Delete'; }
+            });
         }
 
         function editVehicle(vehicleId, make, regNumber) {
@@ -1205,19 +1387,39 @@ $csrfToken = SecurityMiddleware::generateCSRFToken();
 
             const formData = new FormData(form);
             formData.append('action', 'edit');
+            // Ensure we send id param expected by backend
+            if (!formData.get('id')) {
+                formData.append('id', document.getElementById('edit_vehicle_id')?.value || '');
+            }
+            // Add CSRF token to body for robustness
+            formData.append('_token', '<?= htmlspecialchars($csrfToken) ?>');
 
             fetch('vehicle_operations.php', {
                 method: 'POST',
+                headers: { 'X-CSRF-Token': '<?= htmlspecialchars($csrfToken) ?>', 'Accept': 'application/json' },
+                credentials: 'same-origin',
                 body: formData
             })
             .then(response => response.json())
             .then(data => {
                 hideLoading(submitButton);
-                if (data.success) {
-                    showAlert('editVehicle', data.message, 'success');
-                    setTimeout(() => {
-                        location.reload();
-                    }, 1500);
+                if (data.status === 'success' || data.success === true) {
+                    showAlert('editVehicle', data.message || 'Vehicle updated successfully!', 'success');
+                    // Update row without page refresh
+                    const row = document.getElementById('vehicle-' + data.vehicle.vehicle_id);
+                    if (row) {
+                        row.innerHTML = `
+                            <td>${(data.vehicle.make || '—')}</td>
+                            <td>${(data.vehicle.regNumber || '—')}</td>
+                            <td><span class="status-badge status-${(data.vehicle.status || 'inactive')}">${(data.vehicle.status || 'Inactive').charAt(0).toUpperCase() + (data.vehicle.status || 'Inactive').slice(1)}</span></td>
+                            <td><div class="last-updated">${data.vehicle.formatted_last_updated || ''}</div></td>
+                            <td class="action-buttons">
+                                <button class="btn btn-primary btn-icon" onclick="editVehicle(${data.vehicle.vehicle_id}, '${(data.vehicle.make || '').replace(/'/g, "&#39;")}', '${(data.vehicle.regNumber || '').replace(/'/g, "&#39;")}')"><i class="fas fa-pen"></i> Edit</button>
+                                <button class="btn btn-danger btn-icon" onclick="deleteVehicle(${data.vehicle.vehicle_id})"><i class="fas fa-trash"></i> Delete</button>
+                            </td>
+                        `;
+                    }
+                    setTimeout(() => { closeModal('editVehicleModal'); }, 800);
                 } else {
                     showAlert('editVehicle', data.message || 'An error occurred. Please try again.', 'danger');
                 }
@@ -1228,6 +1430,84 @@ $csrfToken = SecurityMiddleware::generateCSRFToken();
                 console.error('Error:', error);
             });
 
+            return false;
+        }
+
+        async function handleOwnerSubmit(event) {
+            event.preventDefault();
+            const form = event.target;
+            const submitButton = form.querySelector('button[type="submit"]');
+            const buttonText = submitButton ? submitButton.querySelector('.button-text') : submitButton;
+            const spinner = submitButton ? submitButton.querySelector('.loading-spinner') : null;
+            
+            // Show loading state
+            if (buttonText) buttonText.textContent = 'Saving...';
+            if (submitButton) submitButton.disabled = true;
+            if (spinner) spinner.style.display = 'inline-block';
+
+            const formData = new FormData(form);
+            const csrfToken = document.querySelector('input[name="_token"]')?.value;
+            
+            if (!csrfToken) {
+                showAlert('error', 'Security token missing. Please refresh the page and try again.', 'editOwnerModal');
+                if (buttonText) buttonText.textContent = 'Save Changes';
+                if (submitButton) submitButton.disabled = false;
+                if (spinner) spinner.style.display = 'none';
+                return false;
+            }
+            
+            try {
+                const response = await fetch('update-owner-info.php', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-Token': csrfToken,
+                        'Accept': 'application/json'
+                    }
+                });
+
+                let responseData;
+                const responseText = await response.text();
+                
+                // Try to parse as JSON
+                try {
+                    responseData = JSON.parse(responseText);
+                } catch (e) {
+                    console.error('Failed to parse JSON response:', responseText);
+                    throw new Error('Invalid server response. Please try again.');
+                }
+
+                if (!response.ok) {
+                    const error = new Error(responseData.message || 'Failed to update information');
+                    error.response = responseData;
+                    throw error;
+                }
+
+                if (responseData && responseData.status === 'success') {
+                    showAlert('success', responseData.message, 'editOwnerModal');
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
+                } else {
+                    throw new Error(responseData?.message || 'Failed to update information');
+                }
+            } catch (error) {
+                console.error('Update error:', error);
+                let errorMessage = 'An error occurred while updating your information.';
+                
+                if (error.message.includes('NetworkError')) {
+                    errorMessage = 'Network error. Please check your connection and try again.';
+                } else if (error.message) {
+                    errorMessage = error.message;
+                }
+                
+                showAlert('error', errorMessage, 'editOwnerModal');
+            } finally {
+                if (buttonText) buttonText.textContent = 'Save Changes';
+                if (submitButton) submitButton.disabled = false;
+                if (spinner) spinner.style.display = 'none';
+            }
+            
             return false;
         }
     </script>

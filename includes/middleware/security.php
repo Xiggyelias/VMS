@@ -113,14 +113,16 @@ class SecurityMiddleware {
         // Explicitly check for login-related routes and public forms
         $exemptRoutes = [
             '/login.php',
-            '/login1.php', 
             '/admin-login.php',
             '/forgot_password.php',
-            '/reset-password.php',
             '/process-reset.php',
             '/send-reset.php',
             '/registration-form.html',
-            '/submit_registration.php'
+            '/registration-form.php',
+            '/submit_registration.php',
+            '/google_auth.php',
+            '/save_registration_draft.php',
+            '/get_registration_draft.php'
         ];
         
         // Check if current route is exempt (handle subdirectory paths)
@@ -145,6 +147,17 @@ class SecurityMiddleware {
                 'route' => $currentRoute
             ]);
             http_response_code(419);
+            // Return JSON for AJAX/JSON requests
+            $expectsJson = (
+                (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') ||
+                (isset($_SERVER['HTTP_ACCEPT']) && stripos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false) ||
+                (isset($_SERVER['CONTENT_TYPE']) && stripos($_SERVER['CONTENT_TYPE'], 'application/json') !== false)
+            );
+            if ($expectsJson) {
+                header('Content-Type: application/json');
+                echo json_encode(['status' => 'error', 'message' => 'Invalid CSRF token']);
+                exit;
+            }
             die('CSRF token missing. Please refresh the page and try again.');
         }
         
@@ -156,6 +169,17 @@ class SecurityMiddleware {
                 'provided_token' => substr($token, 0, 10) . '...'
             ]);
             http_response_code(419);
+            // Return JSON for AJAX/JSON requests
+            $expectsJson = (
+                (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') ||
+                (isset($_SERVER['HTTP_ACCEPT']) && stripos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false) ||
+                (isset($_SERVER['CONTENT_TYPE']) && stripos($_SERVER['CONTENT_TYPE'], 'application/json') !== false)
+            );
+            if ($expectsJson) {
+                header('Content-Type: application/json');
+                echo json_encode(['status' => 'error', 'message' => 'Invalid CSRF token']);
+                exit;
+            }
             die('CSRF token invalid. Please refresh the page and try again.');
         }
     }

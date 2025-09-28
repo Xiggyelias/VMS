@@ -112,3 +112,11 @@ function isDevelopment() {
 function isProduction() {
     return APP_ENV === 'production';
 } 
+
+// Google OAuth configuration
+if (!defined('GOOGLE_CLIENT_ID')) {
+    define('GOOGLE_CLIENT_ID', '561037470081-3fs3roso7v8gnq9idijoap15tn7sqr3l.apps.googleusercontent.com');
+}
+if (!defined('ALLOWED_GOOGLE_DOMAIN')) {
+    define('ALLOWED_GOOGLE_DOMAIN', 'africau.edu');
+}

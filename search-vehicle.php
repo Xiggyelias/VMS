@@ -19,14 +19,15 @@ function escapeHTML($text) {
 }
 
 // ---------- Handle Manual Search Form Submission ----------
-$searchResults = [];
+$vehicle = null;
+$authorizedDrivers = [];
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search_value'])) {
     $searchValue = trim($_POST['search_value']);
 
     if (empty($searchValue)) {
-        $error = "Please enter a plate number";
+        $error = "Please enter a registration number";
     } else {
         $conn = getDBConnection();
 
@@ -43,22 +44,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search_value'])) {
                 v.disk_number,
                 a.idNumber,
                 a.phone,
-                a.email,
-                d.fullname,
-                d.licenseNumber
+                a.email
             FROM vehicles v
             LEFT JOIN applicants a ON v.applicant_id = a.applicant_id
-            LEFT JOIN authorized_driver d ON v.vehicle_id = d.vehicle_id
-            WHERE v.PlateNumber = ?
+            WHERE v.regNumber = ?
         ");
         $stmt->bind_param("s", $searchValue);
         $stmt->execute();
         $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
-            $searchResults = $result->fetch_all(MYSQLI_ASSOC);
+            $vehicle = $result->fetch_assoc();
+            // Fetch authorized drivers linked by applicant_id
+            $drvStmt = $conn->prepare("
+                SELECT fullname, licenseNumber
+                FROM authorized_driver
+                WHERE applicant_id = ?
+                ORDER BY fullname
+            ");
+            $drvStmt->bind_param("i", $vehicle['applicant_id']);
+            $drvStmt->execute();
+            $drvRes = $drvStmt->get_result();
+            if ($drvRes && $drvRes->num_rows > 0) {
+                $authorizedDrivers = $drvRes->fetch_all(MYSQLI_ASSOC);
+            }
+            $drvStmt->close();
         } else {
-            $error = "No vehicle found with the provided plate number";
+            $error = "No vehicle found with the provided registration number";
         }
 
         $stmt->close();
@@ -76,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search_value'])) {
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    background: #121212;
+    background: radial-gradient(1200px 600px at 0% 0%, #2b2b2b 0%, #171717 50%, #121212 100%);
     color: #eee;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     min-height: 100vh;
@@ -85,73 +97,97 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search_value'])) {
     justify-content: center;
   }
   .container {
-            max-width: 1200px;
+            max-width: 1000px;
     width: 100%;
-    background: #1e1e1e;
-    border-radius: 12px;
-    box-shadow: 0 0 20px #d00000aa;
+    background: linear-gradient(180deg, rgba(30,30,30,.9), rgba(24,24,24,.9));
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(208,0,0,.18), inset 0 1px 0 rgba(255,255,255,.03);
     padding: 2rem;
+    border: 1px solid rgba(255,255,255,.06);
+    backdrop-filter: blur(6px);
   }
   header {
     text-align: center;
     margin-bottom: 2rem;
   }
   header img {
-    height: 60px;
+    height: 56px;
     filter: brightness(0) invert(1);
     margin-bottom: 1rem;
   }
   header h1 {
-    font-size: 2.4rem;
-    color: #d00000;
-    letter-spacing: 2px;
+    font-size: 2.2rem;
+    color: #fff;
+    letter-spacing: 1px;
     margin-bottom: 0.2rem;
-    font-weight: 700;
+    font-weight: 800;
+    text-shadow: 0 2px 12px rgba(0,0,0,.35);
   }
   header p {
-    color: #bbb;
-    font-size: 1.1rem;
+    color: #c9c9c9;
+    font-size: 1rem;
         }
         .search-method {
-            background: #292929;
-            padding: 1.5rem;
-            border-radius: 8px;
-            border: 2px solid #333;
+            background: #1b1b1b;
+            padding: 1.25rem 1.25rem 1rem;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,.08);
             margin-bottom: 2rem;
+            box-shadow: 0 8px 26px rgba(0,0,0,.35);
         }
         .search-method h3 {
-            color: #d00000;
-            margin-bottom: 1rem;
-            font-size: 1.2rem;
+            color: #ff4d4d;
+            margin-bottom: .75rem;
+            font-size: 1.05rem;
+            letter-spacing: .5px;
   }
+  .search-input {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+  .search-input i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9aa0a6;
+        }
   input[type="text"] {
             width: 100%;
-            padding: 0.75rem;
-            border: 2px solid #444;
-            border-radius: 6px;
-            background: #1e1e1e;
+            padding: 0.9rem 0.9rem 0.9rem 2.4rem;
+            border: 1px solid #3a3a3a;
+            border-radius: 10px;
+            background: #141414;
     color: #eee;
             font-size: 1rem;
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.02);
+            transition: border-color .2s ease, box-shadow .2s ease;
+        }
+  input[type="text"]:focus {
+            border-color: #ff4d4d;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255,77,77,.15);
         }
         .buttons {
             display: flex;
             gap: 1rem;
   }
   button {
-    background: #d00000;
+    background: linear-gradient(180deg, #ff5a5a, #d00000);
     border: none;
-            padding: 0.75rem 1.5rem;
-    border-radius: 8px;
+            padding: 0.8rem 1.2rem;
+    border-radius: 10px;
     color: white;
     font-weight: 700;
-            font-size: 1rem;
+            font-size: 0.95rem;
     cursor: pointer;
-            transition: all 0.3s ease;
+            transition: transform .15s ease, box-shadow .15s ease;
+            box-shadow: 0 10px 18px rgba(208,0,0,.28);
         }
         button:hover {
-            background: #ff0000;
             transform: translateY(-2px);
+            box-shadow: 0 14px 26px rgba(208,0,0,.35);
         }
         .alert {
             padding: 1rem;
@@ -164,49 +200,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search_value'])) {
     background: #5c0000;
     color: #ff7777;
   }
-  .tabs {
-    margin-top: 1rem;
-  }
+  .tabs { margin-top: 1rem; }
   .tab-buttons {
-    display: flex;
-    gap: 0.5rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: .6rem;
     margin-bottom: 1rem;
   }
   .tab-buttons button {
-    flex: 1;
-    background: #292929;
-    color: #eee;
-    border: 1px solid #444;
-    padding: 0.75rem;
-    font-weight: bold;
-    border-radius: 8px;
+    background: #171717;
+    color: #e8e8e8;
+    border: 1px solid rgba(255,255,255,.08);
+    padding: 0.7rem;
+    font-weight: 600;
+    border-radius: 999px;
     cursor: pointer;
   }
   .tab-buttons button.active {
-    background: #d00000;
-    border-color: #d00000;
+    background: #ff4d4d;
+    border-color: #ff4d4d;
+    color: #fff;
+    box-shadow: 0 8px 18px rgba(255,77,77,.28);
   }
   .tab-content {
     display: none;
-            padding: 1rem;
-            background: #292929;
-            border-radius: 8px;
+            padding: 1rem 1rem 0.2rem;
+            background: #141414;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,.08);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.02);
   }
-  .tab-content.active {
-    display: block;
-  }
+  .tab-content.active { display: block; }
   .info-group {
     margin-bottom: 1rem;
   }
-  .info-label {
-    font-size: 0.85rem;
-    color: #bbb;
-    text-transform: uppercase;
-  }
-  .info-value {
-    font-size: 1.1rem;
-    color: #fff;
-  }
+  .info-label { font-size: 0.78rem; color: #a9a9a9; text-transform: uppercase; letter-spacing: .5px; }
+  .info-value { font-size: 1.05rem; color: #fff; }
         .nav-buttons {
             display: flex;
             gap: 1rem;
@@ -255,23 +284,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search_value'])) {
   <header>
     <img src="AULogo.png" alt="AU Logo" />
             <h1>Vehicle Search</h1>
-            <p>Search vehicle information by plate number</p>
+            <p>Search vehicle information by registration number</p>
   </header>
 
     <div class="nav-buttons">
         <a href="search-vehicle.php" class="nav-btn active">Manual Search</a>
-        <a href="scan-vehicle.php" class="nav-btn">Camera Scanner</a>
         </div>
 
         <!-- Manual Entry Section -->
             <div class="search-method">
                 <h3>Manual Entry</h3>
-                <form method="POST" action="">
+                <p style="color:#a9a9a9;margin:0 0 .75rem 0;font-size:.9rem">Enter the vehicle registration number below to view details.</p>
+                <form method="POST" action="" autocomplete="off">
             <!-- CSRF Token -->
             <input type="hidden" name="_token" value="<?= htmlspecialchars($csrfToken) ?>">
-            
-                    <input type="text" name="search_value" placeholder="Enter plate number" 
+            <div class="search-input">
+                    <i class="fa fa-magnifying-glass"></i>
+                    <input type="text" name="search_value" placeholder="e.g. ABC 123 or ABC123" 
       value="<?= escapeHTML($_POST['search_value'] ?? '') ?>" />
+            </div>
                     <div class="buttons">
     <button type="submit">Search</button>
                         <button type="button" onclick="clearSearch()">Clear</button>
@@ -283,16 +314,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search_value'])) {
     <div class="alert alert-error"><?= escapeHTML($error) ?></div>
   <?php endif; ?>
 
-        <div id="results" style="display: <?= $searchResults ? 'block' : 'none' ?>;">
+        <div id="results" style="display: <?= $vehicle ? 'block' : 'none' ?>;">
     <div class="tabs">
       <div class="tab-buttons">
                     <button class="active" data-tab="vehicleTab">🚗 Vehicle Info</button>
                     <button data-tab="ownerTab">👤 Owner Info</button>
-                    <button data-tab="driverTab">🧑‍✈️ Authorized Driver</button>
+                    <button data-tab="driverTab">🧑‍✈️ Authorized Drivers</button>
       </div>
 
-                <?php if ($searchResults): ?>
-      <?php foreach ($searchResults as $vehicle): ?>
+                <?php if ($vehicle): ?>
         <div id="vehicleTab" class="tab-content active">
           <div class="info-group"><div class="info-label">Make</div><div class="info-value"><?= escapeHTML($vehicle['make']) ?></div></div>
           <div class="info-group"><div class="info-label">Reg Number</div><div class="info-value"><?= escapeHTML($vehicle['regNumber']) ?></div></div>
@@ -308,10 +338,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search_value'])) {
         </div>
 
         <div id="driverTab" class="tab-content">
-          <div class="info-group"><div class="info-label">Full Name</div><div class="info-value"><?= escapeHTML($vehicle['fullname'] ?: 'N/A') ?></div></div>
-          <div class="info-group"><div class="info-label">License Number</div><div class="info-value"><?= escapeHTML($vehicle['licenseNumber'] ?: 'N/A') ?></div></div>
+          <?php if (!empty($authorizedDrivers)): ?>
+            <?php foreach ($authorizedDrivers as $drv): ?>
+              <div class="info-group" style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;align-items:center;">
+                <div>
+                  <div class="info-label">Full Name</div>
+                  <div class="info-value"><?= escapeHTML($drv['fullname']) ?></div>
+                </div>
+                <div>
+                  <div class="info-label">License Number</div>
+                  <div class="info-value"><?= escapeHTML($drv['licenseNumber']) ?></div>
+                </div>
+              </div>
+              <div style="height:1px;background:#2a2a2a;margin:.25rem 0 .6rem 0;border-radius:1px;"></div>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <div class="info-group"><div class="info-label">Authorized Drivers</div><div class="info-value">None</div></div>
+          <?php endif; ?>
         </div>
-      <?php endforeach; ?>
                 <?php endif; ?>
             </div>
     </div>
